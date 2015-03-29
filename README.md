@@ -10,6 +10,8 @@ Direct - load - apk 是一个强大的插件化框架, 通过使用它, 你可�
 > - Direct - load - apk 能够加载插件的全部 **资源**. 
 > - 支持直接启动插件的Service.
 > - 支持直接启动插件的Activity.
+> - 支持直接启动插件的Application.
+> - 支持运行带有.so的apk.
 > - 支持 *插件间* Activity跳转. 
 > - 不像 **"[dynamic load - apk](https://github.com/singwhatiwanna/dynamic-load-apk)"** 这个项目, [**"Direct - load - apk"**](https://github.com/FinalLody/Direct-Load-apk/) 不需要对插件有任何约束，也不需要在插件中引入jar和继承自定义Activity，可以直接使用this指针。
 
@@ -25,8 +27,10 @@ Direct - load - apk 的使用相当方便，可以像这样写:
 
 开发 **进度** 和 **未来将要做的**
 ----------------------------------------------
-> -  即将支持运行带有.so的apk.
-> - 提供完整的插件异常处理机制.
+> - 未来将提供完整的插件异常处理机制。
+> - 未来将完善Preference机制。
+> - 未来将实现为插件定制的PackageManager。
+> - 未来将实现主题皮肤化机制。
 
 **作者**
 -------------
