@@ -66,4 +66,6 @@ Direct - load - apk 的使用相当方便，可以像这样写:
 ###362901808
 ##GitHub:
 ### https://github.com/FinalLody/Direct-Load-apk/
+##OsChina
+### http://git.oschina.net/lody/Direct-load-apk/
 
