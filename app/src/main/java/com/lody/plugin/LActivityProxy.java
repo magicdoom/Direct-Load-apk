@@ -9,6 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.KeyEvent;
@@ -32,6 +33,8 @@ import java.io.File;
 public class LActivityProxy extends Activity implements LProxy {
 
     public LPlugin remotePlugin;
+
+    boolean meetBUG = false;
 
     @Override
     public LPlugin loadPlugin(Activity ctx, String apkPath ) {
@@ -191,6 +194,7 @@ public class LActivityProxy extends Activity implements LProxy {
             plugin.setPluginRes(pluginRes);
             Resources.Theme pluginTheme = plugin.getPluginRes().newTheme();
             pluginTheme.setTo(super.getTheme());
+            //pluginTheme.applyStyle(plugin.getPluginPkgInfo().applicationInfo.theme, true);
             plugin.setCurrentPluginTheme(pluginTheme);
 
         } catch (Exception e){
@@ -228,6 +232,7 @@ public class LActivityProxy extends Activity implements LProxy {
                 System.exit(1);
 
 
+
             }
         });
         super.onCreate(savedInstanceState);
@@ -258,21 +263,27 @@ public class LActivityProxy extends Activity implements LProxy {
             throw new PluginCreateFailedException("Create Plugin failed!");
         }
 
-        //Toast.makeText(this, remotePlugin.getPluginApp()+"", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, remotePlugin.getPluginApplication()+"", Toast.LENGTH_SHORT).show();
 
 
-        PluginActivityControl control = new PluginActivityControl(LActivityProxy.this,remotePlugin.getCurrentPluginActivity(),remotePlugin.getPluginApp());
+        PluginActivityControl control = new PluginActivityControl(LActivityProxy.this,remotePlugin.getCurrentPluginActivity(),remotePlugin.getPluginApplication());
 
         remotePlugin.setControl(control);
         control.dispatchProxyToPlugin();
         Reflect.on( remotePlugin.getCurrentPluginActivity()).call("attachBaseContext",LActivityProxy.this);
-        setTitle(remotePlugin.getPluginPkgInfo().applicationInfo.loadLabel(getPackageManager()));
-        control.callOnCreate(savedInstanceState);
+        //setTitle(remotePlugin.getPluginPkgInfo().applicationInfo.loadLabel(getPackageManager()));
+        try {
+            control.callOnCreate(savedInstanceState);
+        }catch (Exception e){
+            meetBUG = true;
+            processError(e);
+        }
 
     }
 
+    private void processError(Exception e) {
 
-
+    }
 
 
     @Override
@@ -318,6 +329,7 @@ public class LActivityProxy extends Activity implements LProxy {
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
+
             caller.callOnResume();
         }
     }
@@ -328,9 +340,17 @@ public class LActivityProxy extends Activity implements LProxy {
         if(remotePlugin == null){
             return;
         }
+
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
-            caller.callOnStop();
+            //if(!meetBUG) {
+                try {
+                    caller.callOnStop();
+                }catch (Exception e){
+                    meetBUG = true;
+                    processError(e);
+                }
+           // }
         }
     }
 
@@ -343,7 +363,14 @@ public class LActivityProxy extends Activity implements LProxy {
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
-            caller.callOnDestroy();
+            if(!meetBUG) {
+                try {
+                    caller.callOnDestroy();
+                }catch (Exception e){
+                    meetBUG = true;
+                    processError(e);
+                }
+            }
         }
 
 
@@ -357,7 +384,14 @@ public class LActivityProxy extends Activity implements LProxy {
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
-            caller.callOnPause();
+            if(!meetBUG) {
+                try {
+                    caller.callOnPause();
+                }catch (Exception e){
+                    meetBUG = true;
+                    processError(e);
+                }
+            }
         }
     }
 
@@ -369,7 +403,14 @@ public class LActivityProxy extends Activity implements LProxy {
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
-            caller.callOnSaveInstanceState(outState);
+            if(!meetBUG) {
+                try {
+                    caller.callOnSaveInstanceState(outState);
+                }catch (Exception e){
+                    meetBUG = true;
+                    processError(e);
+                }
+            }
         }
     }
 
@@ -381,20 +422,34 @@ public class LActivityProxy extends Activity implements LProxy {
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
-            caller.callOnRestoreInstanceState(savedInstanceState);
+            if(!meetBUG) {
+                try {
+                    caller.callOnRestoreInstanceState(savedInstanceState);
+                }catch (Exception e){
+                    meetBUG = true;
+                    processError(e);
+                }
+
+            }
         }
-        getFragmentManager();
+
     }
 
     @Override
     public void onBackPressed() {
 
-        if(remotePlugin == null){
+        if(remotePlugin == null||meetBUG){
             super.onBackPressed();
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
-            caller.callOnBackPressed();
+            try {
+                caller.callOnBackPressed();
+            }catch (Exception e){
+                meetBUG = true;
+                processError(e);
+            }
+
         }
     }
 
@@ -406,7 +461,15 @@ public class LActivityProxy extends Activity implements LProxy {
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
-            caller.callOnStop();
+            if(!meetBUG) {
+                try {
+                    caller.callOnStop();
+                }catch (Exception e){
+                    meetBUG = true;
+                    processError(e);
+                }
+
+            }
         }
     }
 
@@ -418,7 +481,12 @@ public class LActivityProxy extends Activity implements LProxy {
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
-            caller.callOnRestart();
+            try {
+                caller.callOnRestart();
+            }catch (Exception e){
+                meetBUG = true;
+                processError(e);
+            }
         }
     }
 
@@ -429,6 +497,7 @@ public class LActivityProxy extends Activity implements LProxy {
         }
         PluginActivityCaller caller = remotePlugin.getControl();
         if(caller != null){
+            if(!meetBUG)
             return caller.callOnKeyDown(keyCode,event);
         }
         return super.onKeyDown(keyCode, event);
@@ -437,9 +506,20 @@ public class LActivityProxy extends Activity implements LProxy {
 
     @Override
     public ComponentName startService(Intent service) {
+        //TODO:转移Service跳转目标
         Intent i = new Intent(this, LServiceProxy.class);
-       Toast.makeText(this,"Sorry,Direct-Load-Apk is not support Service yet:) \nIt well support in the near!",Toast.LENGTH_SHORT).show();
-        return i.getComponent();
+        String className = service.getComponent().getClassName();
+        remotePlugin.setCurrentServiceClassName(className);
+        i.setAction(service.getAction());
+        i.setData(service.getData());
+        if(Build.VERSION.SDK_INT >= 16)
+        i.setClipData(service.getClipData());
+        i.setFlags(service.getFlags());
+        if(Build.VERSION.SDK_INT>= 15)
+        i.setSelector(service.getSelector());
+        Toast.makeText(this,"Start Service :" + className,Toast.LENGTH_LONG).show();
+
+        return super.startService(i);
     }
 
 
