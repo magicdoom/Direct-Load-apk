@@ -34,3 +34,5 @@ Direct - load - apk 的使用相当方便，可以像这样写:
 ###362901808
 ##GitHub:
 ### https://github.com/FinalLody/Direct-Load-apk/
+##Direct-Load-apk原理篇：
+### http://my.oschina.net/u/2289564/blog/393252#OSC_h3_4
