@@ -11,21 +11,21 @@ Direct - load - apk is a very powerful plugin framework, through the use of it, 
 > - Support to jump between the **plugin Activity**. 
 > - Don't like "**[dynamic load - apk](https://github.com/singwhatiwanna/dynamic-load-apk)**" , [**"Direct - load - apk"**](https://github.com/asLody/Direct-load-apk) do not need to inherit the custom Activity, and can directly use this pointer. 
 
-#### <i class="icon-folder-open"></i> ***Usage***
+#### ***Usage***
 
 Direct - load - apk is very convenient to use .You can write to start an APK likes this:
 
     PluginLaunch.startPlugin(Context,Path);
 
 > **Tip:** Don't forget to write **com.lody.plugin.LActivityProxy** in AndroidManifest.xml.
-#### <i class="icon-pencil"></i> The development **Progress** and **TODO**
+#### The development **Progress** and **TODO**
 > - Service support in the near.
 > -  Run the apk which is included the file of ".so" in the near.
 > - Support Plug-in security isolation system In the future.
 
 **Author**
 -------------
-	 Lody, from China, who is An ideal are ambitious young man.
+     Lody, from China, who is An ideal are ambitious young man.
 If you have any question , please send **Email** to here: **382816028@qq.com** , You can also Contact me through **QQ**:**382816028**.
 
 ##QQ GROUP:
@@ -43,8 +43,7 @@ Direct - load - apk 是一个强大的插件化框架, 通过使用它, 你可�
 > - 支持 *插件间* Activity跳转. 
 > - 不像 **"[dynamic load - apk](https://github.com/singwhatiwanna/dynamic-load-apk)"** 这个项目, [**"Direct - load - apk"**](https://github.com/FinalLody/Direct-Load-apk/) 不需要对插件有任何约束，也不需要在插件中引入jar和继承自定义Activity，可以直接使用this指针。
 
-
- #### <i class="icon-folder-open"></i> 使用方法
+####  使用方法
 
 Direct - load - apk 的使用相当方便，可以像这样写:
 
@@ -52,7 +51,7 @@ Direct - load - apk 的使用相当方便，可以像这样写:
 
 > **提示:** 不要忘了在 AndroidManifest.xml 加入 **com.lody.plugin.LActivityProxy** .
 
-#### <i class="icon-pencil"></i> 开发 **进度** 和 **未来将要做的**
+#### 开发 **进度** 和 **未来将要做的**
 > - 即将支持Service.
 > -  即将支持运行带有.so的apk.
 > - 提供完整的插件异常处理机制.

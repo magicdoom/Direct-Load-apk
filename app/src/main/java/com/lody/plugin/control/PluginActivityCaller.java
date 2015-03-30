@@ -23,8 +23,6 @@ public interface PluginActivityCaller {
 
     void callOnRestoreInstanceState(Bundle savedInstanceState);
 
-    void callOnConfigurationChanged();
-
     void callOnPause();
 
     void callOnBackPressed();

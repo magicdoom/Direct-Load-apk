@@ -16,7 +16,7 @@ public class LPluginManager{
     public static String finalApkPath;
 
     /**
-     * First,Load from Cache,if return null,than load new Plugin.
+     * 先从缓存中读取Plugin，如果缓存中没有找到，尝试创建Plugin
      * @param proxyParent
      * @param apkPath
      * @return
@@ -31,6 +31,14 @@ public class LPluginManager{
         return plugin;
     }
 
+    /**
+     * 得到一个已经加载的Plugin,可能返回null
+     * @return
+     */
+    public static LPlugin getLoadedPlugin(String apkPath){
+        finalApkPath = apkPath;
 
+        return pluginsMapForPath.get(apkPath);
+    }
 
 }
