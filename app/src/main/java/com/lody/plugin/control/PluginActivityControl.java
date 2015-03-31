@@ -17,7 +17,7 @@ import com.lody.plugin.reflect.ReflectException;
  * 插件的控制器<br>
  * 派发插件事件和控制插件生命周期
  */
-public class PluginActivityControl implements PluginActivityCaller {
+public class PluginActivityControl implements PluginActivityCallback {
 
     Activity proxy;//代理Activity
     Activity plugin;//插件Activity
