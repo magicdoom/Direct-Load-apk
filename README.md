@@ -5,7 +5,7 @@ Direct-load-apk
 Description
 -------------
 
-Direct - load - apk is a very powerful plugin framework, through it, you can achieve incredible function ----- **load a normal apk as a plug-in directly without install it!** 
+Direct - load - apk is a very powerful plugin framework, through it, you can amke incredible thing ----- **load a normal apk as a plug-in directly without install it!** 
 
 > **Advantage:** 
 > - Direct - load - apk can load all **Resources** from an apk which loaded as a plug-in. 
@@ -25,9 +25,11 @@ Direct - load - apk is very convenient to use .You can write to start an APK lik
 > **Tip:** Don't forget to write **com.lody.plugin.LActivityProxy** in AndroidManifest.xml.
 
 #### The development **Progress** and **TODO**
-> - Service support in the near.
-> -  Run the apk which is included the file of ".so" in the near.
-> - Support Plug-in security isolation system In the future.
+> - Support complete Exception handler.
+> - Support Preference for plug-in apk.
+> - Support PackageManager for each plug-in apk.
+> - Support Theme in plug-in apk.
+> - Support Fragment.
 
 **Author**
 -------------
