@@ -28,4 +28,9 @@ public class LPluginConfig {
      */
     public static final String KEY_PLUGIN_INDEX = "activity_index";
 
+    /**
+     * 是否使用插件的标题
+     */
+    public static boolean usePluginTitle = true;
+
 }

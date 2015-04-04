@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.lody.plugin.manager.LPluginManager;
 import com.lody.plugin.bean.LPlugin;
 import com.lody.plugin.exception.LaunchPluginException;
 import com.lody.plugin.exception.PluginCreateFailedException;
@@ -67,7 +66,7 @@ public class LServiceProxy extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        thisRef = Reflect.on(LServiceProxy.this);
+        /*thisRef = Reflect.on(LServiceProxy.this);
         remotePlugin = LPluginManager.getLoadedPlugin(LPluginManager.finalApkPath);
         if(remotePlugin == null){
             throw new LaunchPluginException("Service is depend on a plugin.");
@@ -77,7 +76,7 @@ public class LServiceProxy extends Service {
         }
         fillPluginService(remotePlugin);
 
-        serviceRef.call("onCreate");
+        serviceRef.call("onCreate");*/
 
 
     }

@@ -5,7 +5,7 @@ Direct-load-apk
 Description
 -------------
 
-Direct - load - apk is a very powerful plugin framework, through it, you can amke incredible thing ----- **load a normal apk as a plug-in directly without install it!** 
+Direct - load - apk is a very powerful plugin framework, through it, you can make incredible thing ----- **load a normal apk as a plug-in directly without install it!** 
 
 > **Advantage:** 
 > - Direct - load - apk can load all **Resources** from an apk which loaded as a plug-in. 

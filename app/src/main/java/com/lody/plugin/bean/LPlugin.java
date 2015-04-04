@@ -13,6 +13,8 @@ import com.lody.plugin.control.PluginActivityControl;
 
 import java.util.List;
 
+import dalvik.system.DexClassLoader;
+
 /**
  * Created by lody  on 2015/3/27.
  */
@@ -38,7 +40,7 @@ public class LPlugin {
     /** 插件实体Activity */
     private Activity CurrentPluginActivity;
     /** 插件加载器 */
-    private ClassLoader pluginLoader;
+    private DexClassLoader pluginLoader;
     /** 插件是否已经完成初始化 */
     boolean isPluginInit;
     /**插件的Action过滤器 */
@@ -222,11 +224,11 @@ public class LPlugin {
      * 插件的类加载器
      * @return
      */
-    public ClassLoader getPluginLoader() {
+    public DexClassLoader getPluginLoader() {
         return pluginLoader;
     }
 
-    public void setPluginLoader(ClassLoader pluginLoader) {
+    public void setPluginLoader(DexClassLoader pluginLoader) {
         this.pluginLoader = pluginLoader;
     }
 

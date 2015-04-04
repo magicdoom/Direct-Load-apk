@@ -14,7 +14,6 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -37,13 +36,14 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 
+import dalvik.system.DexClassLoader;
+
 /**
  * Created by lody  on 2015/3/27.
  */
 public class LActivityProxy extends Activity implements ILoadPlugin {
 
     public LPlugin remotePlugin;
-
     boolean meetBUG = false;
 
     @Override
@@ -153,6 +153,16 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
             getWindow().setSoftInputMode(curActivityInfo.softInputMode);
         }
 
+        if(LPluginConfig.usePluginTitle){
+            CharSequence title = null;
+            try {
+                title = LPluginTool.getAppName(this,plugin.getPluginPath());
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+            if(title != null) setTitle(title);
+        }
+
 
     }
 
@@ -187,14 +197,25 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     private void fillPluginLoader(LPlugin plugin) {
 
 
-        LPluginDexManager loader = LPluginDexManager.getClassLoader(plugin.getPluginPath(), LActivityProxy.this, getClassLoader());
-        plugin.setPluginLoader(loader);
+        DexClassLoader loader = null;
+        if((loader = plugin.getPluginLoader()) == null){
+            loader = LPluginDexManager.getClassLoader(plugin.getPluginPath(), LActivityProxy.this, getClassLoader());
+            plugin.setPluginLoader(loader);
+        }
 
         String top = plugin.getTopActivityName();
         if (top == null) {
             top = plugin.getActivityInfos()[0].name;
             plugin.setTopActivityName(top);
         }
+        fillPluginActivity(plugin);
+    }
+
+    /**
+     * 装载插件的Activity
+     * @param plugin
+     */
+    private void fillPluginActivity(LPlugin plugin) {
         try {
             Activity myPlugin = (Activity) plugin.getPluginLoader().loadClass(plugin.getTopActivityName()).newInstance();
             plugin.setCurrentPluginActivity(myPlugin);
@@ -253,11 +274,11 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread thread, final Throwable ex) {
 
-                Log.e("Direct-Load-APK-error",ex.getMessage());
                 LPluginError error = new LPluginError();
                 error.error = ex;
                 error.errorTime = System.currentTimeMillis();
@@ -285,6 +306,7 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
         if (pluginDexPath == LPluginConfig.DEF_PLUGIN_DEX_PATH) {
             throw new PluginCreateFailedException("Please put the Plugin Path!");
         }
+
         remotePlugin = loadPlugin(LActivityProxy.this, pluginDexPath, false);
         if (pluginActivityName != LPluginConfig.DEF_PLUGIN_CLASS_NAME) {
             remotePlugin.setTopActivityName(pluginActivityName);
@@ -293,13 +315,10 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
         if (!remotePlugin.isPluginInit()) {
             fillPlugin(remotePlugin);
         }
-        fillPluginLoader(remotePlugin);
 
         if (!remotePlugin.isPluginInit()) {
             throw new PluginCreateFailedException("Create Plugin failed!");
         }
-
-        //Toast.makeText(this, remotePlugin.getPluginApplication()+"", Toast.LENGTH_SHORT).show();
 
 
         PluginActivityControl control = new PluginActivityControl(LActivityProxy.this, remotePlugin.getCurrentPluginActivity(), remotePlugin.getPluginApplication());
@@ -318,6 +337,7 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
 
     private void processError(Exception e) {
 
+        //Not use yet
     }
 
 
@@ -432,7 +452,15 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
         }
     }
 
-    @Override
+
+
+
+    //Lody~
+    //FIX ME:序列化和反序列化暂时工作不正常，
+    //原因是序列化使用的类加载器不包含插件的类。
+    //
+
+/*    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (remotePlugin == null) {
@@ -450,9 +478,9 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
                 }
             }
         }
-    }
+    }*/
 
-    @Override
+/*    @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (remotePlugin == null) {
@@ -472,13 +500,19 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
             }
         }
 
-    }
+    }*/
 
     @Override
     public void onBackPressed() {
 
-        if (remotePlugin == null || meetBUG) {
+        if (remotePlugin == null) {
             super.onBackPressed();
+        }
+        if(meetBUG){
+            //这种情况下，应该立即退出插件，不然Activity将会阻塞
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(1);
+
         }
         PluginActivityCallback caller = remotePlugin.getControl();
         if (caller != null) {
@@ -561,88 +595,97 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     }
 
     //Finals 添加，修复Fragment点击返回的时候出现崩溃BUG
-     @Override
+    @Override
     public void dump(String prefix, FileDescriptor fd, PrintWriter writer,String[] args) {
         super.dump(prefix, fd, writer, args);
-    	if(remotePlugin==null){
-			return;
-		}
-    	PluginActivityCallback caller = remotePlugin.getControl();
-		if (caller != null) {
-			caller.callDump(prefix, fd, writer, args);
-		}
+        if(remotePlugin==null){
+            return;
+        }
+        PluginActivityCallback caller = remotePlugin.getControl();
+        if (caller != null) {
+            caller.callDump(prefix, fd, writer, args);
+        }
     }
-     
-     @Override
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
-    	super.onConfigurationChanged(newConfig);
-    	if(remotePlugin==null){
-			return;
-		}
-    	PluginActivityCallback caller = remotePlugin.getControl();
-		if (caller != null) {
-			caller.callOnConfigurationChanged();
-		}
+        super.onConfigurationChanged(newConfig);
+        if(remotePlugin==null){
+            return;
+        }
+        PluginActivityCallback caller = remotePlugin.getControl();
+        if (caller != null) {
+            caller.callOnConfigurationChanged();
+        }
     }
-     
+
     @Override
     protected void onPostResume() {
-    	super.onPostResume();
-    	if(remotePlugin==null){
-			return;
-		}
-		PluginActivityCallback caller = remotePlugin.getControl();
-		if (caller != null) {
-			caller.callOnPostResume();
-		}
+        super.onPostResume();
+        if(remotePlugin==null){
+            return;
+        }
+        PluginActivityCallback caller = remotePlugin.getControl();
+        if (caller != null) {
+            caller.callOnPostResume();
+        }
     }
-    
+
     @Override
     public void onDetachedFromWindow() {
-    	if (remotePlugin == null) {
-			return;
-		}
-		PluginActivityCallback caller = remotePlugin.getControl();
-		if (caller != null) {
-			caller.callOnDetachedFromWindow();
-		}
-    	super.onDetachedFromWindow();
+        if (remotePlugin == null) {
+            return;
+        }
+        PluginActivityCallback caller = remotePlugin.getControl();
+        if (caller != null) {
+            caller.callOnDetachedFromWindow();
+        }
+        super.onDetachedFromWindow();
     }
-    
+
     @Override
     public View onCreateView(String name, Context context, AttributeSet attrs) {
-    	if (remotePlugin == null) {
-			return super.onCreateView(name, context, attrs);
-		}
-		PluginActivityCallback caller = remotePlugin.getControl();
-		if (caller != null) {
-			return caller.callOnCreateView(name, context, attrs);
-		}
-    	return super.onCreateView(name, context, attrs);
+        if (remotePlugin == null) {
+            return super.onCreateView(name, context, attrs);
+        }
+        PluginActivityCallback caller = remotePlugin.getControl();
+        if (caller != null) {
+            return caller.callOnCreateView(name, context, attrs);
+        }
+        return super.onCreateView(name, context, attrs);
     }
-    
+
     @Override
     public View onCreateView(View parent, String name, Context context,
-    		AttributeSet attrs) {
-    	if (remotePlugin == null) {
-			return super.onCreateView(parent, name, context, attrs);
-		}
-		PluginActivityCallback caller = remotePlugin.getControl();
-		if (caller != null) {
-			return caller.callOnCreateView(parent, name, context, attrs);
-		}
-    	return super.onCreateView(parent, name, context, attrs);
+                             AttributeSet attrs) {
+        if (remotePlugin == null) {
+            return super.onCreateView(parent, name, context, attrs);
+        }
+        PluginActivityCallback caller = remotePlugin.getControl();
+        if (caller != null) {
+            return caller.callOnCreateView(parent, name, context, attrs);
+        }
+        return super.onCreateView(parent, name, context, attrs);
     }
-    
+
     @Override
     protected void onNewIntent(Intent intent) {
-    	super.onNewIntent(intent);
-    	if(remotePlugin==null){
-			return;
-		}
-		PluginActivityCallback caller = remotePlugin.getControl();
-		if (caller != null) {
-			caller.callOnNewIntent(intent);
-		}
+        super.onNewIntent(intent);
+        if(remotePlugin==null){
+            return;
+        }
+        PluginActivityCallback caller = remotePlugin.getControl();
+        if (caller != null) {
+            caller.callOnNewIntent(intent);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(remotePlugin == null){
+            return;
+        }
+       remotePlugin.getControl().getPluginRef().call("onActivityResult",requestCode,resultCode,data);
     }
 }

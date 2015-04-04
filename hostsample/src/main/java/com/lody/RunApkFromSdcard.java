@@ -1,7 +1,12 @@
 package com.lody;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.AttributeSet;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,10 +15,14 @@ import android.widget.Toast;
 import com.lody.plugin.LPluginOpener;
 import com.lody.plugin.api.LPluginError;
 import com.lody.plugin.api.LPluginErrorListener;
+import com.lody.plugin.control.PluginActivityCallback;
+import com.lody.plugin.manager.LCallbackManager;
 import com.lody.plugin.manager.LPluginErrorManager;
 import com.lody.sample.R;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 
 /**
  * Created by lody  on 2015/4/4.
@@ -43,8 +52,103 @@ public class RunApkFromSdcard extends Activity {
                 LPluginErrorManager.addErrorListener(new LPluginErrorListener() {
                     @Override
                     public void OnError(LPluginError error) {
+
+                        Log.e("DEBUG",error.error.getMessage());
                         android.os.Process.killProcess(error.processId);
                         System.exit(1);
+                    }
+                });
+
+
+                LCallbackManager.addActivityCallback(new PluginActivityCallback() {
+                    @Override
+                    public void callOnCreate(Bundle saveInstance) {
+
+                    }
+
+                    @Override
+                    public void callOnStart() {
+
+                    }
+
+                    @Override
+                    public void callOnResume() {
+
+                    }
+
+                    @Override
+                    public void callOnDestroy() {
+
+                    }
+
+                    @Override
+                    public void callOnStop() {
+
+                    }
+
+                    @Override
+                    public void callOnRestart() {
+
+                    }
+
+                    @Override
+                    public void callOnSaveInstanceState(Bundle outState) {
+
+                    }
+
+                    @Override
+                    public void callOnRestoreInstanceState(Bundle savedInstanceState) {
+
+                    }
+
+                    @Override
+                    public void callOnPause() {
+
+                    }
+
+                    @Override
+                    public void callOnBackPressed() {
+
+                    }
+
+                    @Override
+                    public boolean callOnKeyDown(int keyCode, KeyEvent event) {
+                        return false;
+                    }
+
+                    @Override
+                    public void callDump(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
+
+                    }
+
+                    @Override
+                    public void callOnConfigurationChanged() {
+
+                    }
+
+                    @Override
+                    public void callOnPostResume() {
+
+                    }
+
+                    @Override
+                    public void callOnDetachedFromWindow() {
+
+                    }
+
+                    @Override
+                    public View callOnCreateView(String name, Context context, AttributeSet attrs) {
+                        return null;
+                    }
+
+                    @Override
+                    public View callOnCreateView(View parent, String name, Context context, AttributeSet attrs) {
+                        return null;
+                    }
+
+                    @Override
+                    public void callOnNewIntent(Intent intent) {
+
                     }
                 });
                 LPluginOpener.startPlugin(RunApkFromSdcard.this, path);

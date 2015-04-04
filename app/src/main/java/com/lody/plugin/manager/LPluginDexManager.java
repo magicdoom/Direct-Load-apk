@@ -11,7 +11,8 @@ import dalvik.system.DexClassLoader;
 
 /**
  * Created by lody  on 2015/3/24.
- * 插件的核心加载器
+ * 插件的核心加载器<br>
+ * 已支持Native
  */
 public class LPluginDexManager extends DexClassLoader {
 
@@ -20,6 +21,7 @@ public class LPluginDexManager extends DexClassLoader {
     protected LPluginDexManager(String dexPath, String optimizedDirectory,
                                 String libraryPath, ClassLoader parent) {
         super(dexPath, optimizedDirectory, libraryPath, parent);
+        LSOUnpacker.unPackSOFromApk(dexPath,libraryPath);
     }
 
     /**
@@ -34,7 +36,7 @@ public class LPluginDexManager extends DexClassLoader {
                     .getDir("plugin", Context.MODE_PRIVATE).getAbsolutePath();
             final String libOutputPath = cxt
                     .getDir("plugin_lib", Context.MODE_PRIVATE).getAbsolutePath();
-            LSOUnpacker.unPackSOFromApk(dexPath);
+
             pluginDexLoader = new LPluginDexManager(dexPath, dexOutputPath, libOutputPath, parent);
             pluginLoader.put(dexPath, pluginDexLoader);
         }

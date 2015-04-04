@@ -24,6 +24,21 @@ public class LPluginOpener {
     }
 
     /**
+     * 启动插件中的指定activity
+     * @param context
+     * @param pluginPath
+     * @param activityName 要启动的插件的activity名
+     */
+    public static void startPlugin(Context context, String pluginPath,String activityName) {
+        Intent i = new Intent(context, LActivityProxy.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(LPluginConfig.KEY_PLUGIN_DEX_PATH, pluginPath);
+        bundle.putString(LPluginConfig.DEF_PLUGIN_CLASS_NAME,activityName);
+        i.putExtras(bundle);
+        context.startActivity(i);
+    }
+
+    /**
      * 直接启动一个apk
      *
      * @param context

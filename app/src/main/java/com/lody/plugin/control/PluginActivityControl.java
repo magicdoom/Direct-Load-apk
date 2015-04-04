@@ -58,6 +58,8 @@ public class PluginActivityControl implements PluginActivityCallback {
     }
 
     public void dispatchProxyToPlugin() {
+
+        if(plugin.getBaseContext() != null) return;
         try {
             //Finals 修改以前的注入方式，采用原生的方式
             Instrumentation instrumentation = proxyRef.get("mInstrumentation");

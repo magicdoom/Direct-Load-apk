@@ -1,12 +1,96 @@
 package com.lody.plugin;
 
+import android.util.Log;
+
+import com.lody.plugin.api.LFileTools;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+
 /**
  * Created by lody  on 2015/4/4.
+ *
+ * 根据CPU型号解压apk内的相应的.so文件
  */
 public class LSOUnpacker {
-    public static void unPackSOFromApk(String apkPath){
+    
+    public static final String TAG = LSOUnpacker.class.getSimpleName();
+    public static void unPackSOFromApk(String apkPath,String toPath){
+
+        try {
+            ZipFile apk = new ZipFile(new File(apkPath));
+            boolean hasLib = extractLibFile(apk,new File(toPath));
+            if(hasLib){
+                Log.i(TAG,"The plugin is contains so files.");
+            }
 
 
+        } catch (Exception e) {
+            Log.e(TAG,e.getMessage());
+        }
 
+    }
+
+    private static boolean extractLibFile(ZipFile zip, File to)
+            throws ZipException, IOException {
+
+
+        String defaultArch = "armeabi";//默认为arm平台
+        Map<String,List<ZipEntry>> archLibEntries = new HashMap<String, List<ZipEntry>>();
+        for (Enumeration<? extends ZipEntry> e = zip.entries(); e
+                .hasMoreElements();) {
+            ZipEntry entry = e.nextElement();
+            String name = entry.getName();
+            if (name.startsWith("/")) {
+                name = name.substring(1);
+            }
+            if (name.startsWith("lib/")) {
+                if(entry.isDirectory()){
+                    continue;
+                }
+                int sp = name.indexOf('/', 4);
+                String en2add;
+                if (sp > 0) {
+                    String osArch = name.substring(4, sp);
+                    en2add=osArch.toLowerCase();
+                } else {
+                    en2add=defaultArch;
+                }
+                List<ZipEntry> zipEntries = archLibEntries.get(en2add);
+                if (zipEntries == null) {
+                    zipEntries = new LinkedList<ZipEntry>();
+                    archLibEntries.put(en2add, zipEntries);
+                }
+                zipEntries.add(entry);
+            }
+        }
+        String arch = System.getProperty("os.arch");//得到CPU信息
+        List<ZipEntry> libEntries = archLibEntries.get(arch.toLowerCase());
+        if (libEntries == null) {
+            libEntries = archLibEntries.get(defaultArch);
+        }
+        boolean hasLib = false;//是否包含so
+        if (libEntries != null) {
+            hasLib = true;
+            if (!to.exists()) {
+                to.mkdirs();
+            }
+            for (ZipEntry libEntry : libEntries) {
+                String name = libEntry.getName();
+                String pureName = name.substring(name.lastIndexOf('/') + 1);
+                File target = new File(to, pureName);
+                LFileTools.writeToFile(zip.getInputStream(libEntry), target);
+            }
+        }
+
+        return hasLib;
     }
 }
