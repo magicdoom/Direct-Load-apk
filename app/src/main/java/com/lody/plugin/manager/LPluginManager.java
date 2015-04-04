@@ -1,4 +1,4 @@
-package com.lody.plugin;
+package com.lody.plugin.manager;
 
 import android.app.Activity;
 
@@ -28,6 +28,7 @@ public class LPluginManager{
         if(plugin == null){
             plugin = new LPlugin(proxyParent,apkPath);
         }
+        pluginsMapForPath.put(apkPath,plugin);
         return plugin;
     }
 

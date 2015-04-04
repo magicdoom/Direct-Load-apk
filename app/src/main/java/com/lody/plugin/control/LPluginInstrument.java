@@ -11,7 +11,7 @@ import android.os.IBinder;
 
 import com.lody.plugin.LActivityProxy;
 import com.lody.plugin.LPluginConfig;
-import com.lody.plugin.LPluginManager;
+import com.lody.plugin.manager.LPluginManager;
 import com.lody.plugin.reflect.Reflect;
 
 /**

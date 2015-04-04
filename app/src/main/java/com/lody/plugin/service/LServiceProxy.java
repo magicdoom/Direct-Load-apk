@@ -4,7 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.lody.plugin.LPluginManager;
+import com.lody.plugin.manager.LPluginManager;
 import com.lody.plugin.bean.LPlugin;
 import com.lody.plugin.exception.LaunchPluginException;
 import com.lody.plugin.exception.PluginCreateFailedException;

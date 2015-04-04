@@ -7,7 +7,7 @@ import android.os.Bundle;
 /**
  * Created by lody  on 2015/3/24.
  */
-public class PluginLaunch {
+public class LPluginOpener {
 
     /**
      * 直接启动一个apk
@@ -28,7 +28,7 @@ public class PluginLaunch {
      *
      * @param context
      * @param pluginPath
-     * @param index      插件中的第几个Activity？
+     * @param index  插件中的第几个Activity？
      */
     public static void startPlugin(Context context, String pluginPath, int index) {
         Intent i = new Intent(context, LActivityProxy.class);

@@ -144,8 +144,9 @@
         <!--插件的代理器，使用框架必须声明-->
         <activity android:name="com.lody.plugin.LActivityProxy"/>
         <service android:name="com.lody.plugin.service.LServiceProxy"/>
+
         <activity
-            android:name=".Main"
+            android:name="com.lody.Main"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -153,6 +154,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.lody.RunApkFromSdcard"/>
     </application>
 
 

@@ -1,8 +1,9 @@
-package com.lody.plugin;
+package com.lody.plugin.manager;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
 
+import com.lody.plugin.EasyFor;
 import com.lody.plugin.control.PluginActivityCallback;
 
 import java.util.ArrayList;
@@ -99,7 +100,6 @@ public class LCallbackManager {
         new EasyFor<PluginActivityCallback>(pluginsMapForPath){
             @Override
             public void onNewElement(PluginActivityCallback element) {
-                element.callOnDestroy();
                 element.callOnSaveInstanceState(out);
 
             }

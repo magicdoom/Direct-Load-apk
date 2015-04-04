@@ -7,14 +7,14 @@ import com.lody.plugin.bean.LPlugin;
 /**
  * Created by lody  on 2015/3/27.
  */
-public interface LProxy {
+public interface ILoadPlugin {
     /**
      * 根据apk路径加载一个插件
      * @param proxyParent 代理activity
      * @param apkPath apk路径
      * @return 插件的bean
      */
-    LPlugin loadPlugin(Activity proxyParent,String apkPath);
+    LPlugin loadPlugin(Activity proxyParent, String apkPath);
 
     /**
      *根据apk路径加载一个插件
@@ -23,16 +23,16 @@ public interface LProxy {
      * @param checkInit 是否检测插件是否初始化？
      * @return 插件的bean
      */
-    LPlugin loadPlugin(Activity proxyParent,String apkPath ,boolean checkInit);
+    LPlugin loadPlugin(Activity proxyParent, String apkPath, boolean checkInit);
 
     /**
-     * 加根据apk路径加载一个插件
+     * 根据apk路径加载一个插件
      * @param proxyParent 代理activity
      * @param apkPath apk路径
      * @param activityName 启动的activity名
      * @return
      */
-    LPlugin loadPlugin(Activity proxyParent,String apkPath,String activityName);
+    LPlugin loadPlugin(Activity proxyParent, String apkPath, String activityName);
 
     /**
      * 根据apk路径加载一个插件
@@ -41,7 +41,7 @@ public interface LProxy {
      * @param index  启动的activity在AndroidManifest.xml的索引值
      * @return
      */
-    LPlugin loadPlugin(Activity proxyParent,String apkPath,int index);
+    LPlugin loadPlugin(Activity proxyParent, String apkPath, int index);
 
     /**
      * 装载一个插件<br>

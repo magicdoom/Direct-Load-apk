@@ -9,13 +9,16 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
+import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
-import android.widget.Toast;
+import android.view.View;
 
+import com.lody.plugin.api.LPluginError;
 import com.lody.plugin.bean.LPlugin;
 import com.lody.plugin.control.PluginActivityCallback;
 import com.lody.plugin.control.PluginActivityControl;
@@ -23,15 +26,21 @@ import com.lody.plugin.exception.LaunchPluginException;
 import com.lody.plugin.exception.NotFoundPluginException;
 import com.lody.plugin.exception.PluginCreateFailedException;
 import com.lody.plugin.exception.PluginNotExistException;
+import com.lody.plugin.manager.LCallbackManager;
+import com.lody.plugin.manager.LPluginDexManager;
+import com.lody.plugin.manager.LPluginErrorManager;
+import com.lody.plugin.manager.LPluginManager;
 import com.lody.plugin.reflect.Reflect;
 import com.lody.plugin.service.LServiceProxy;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 
 /**
  * Created by lody  on 2015/3/27.
  */
-public class LActivityProxy extends Activity implements LProxy {
+public class LActivityProxy extends Activity implements ILoadPlugin {
 
     public LPlugin remotePlugin;
 
@@ -178,7 +187,7 @@ public class LActivityProxy extends Activity implements LProxy {
     private void fillPluginLoader(LPlugin plugin) {
 
 
-        LPluginDexLoader loader = LPluginDexLoader.getClassLoader(plugin.getPluginPath(), LActivityProxy.this, getClassLoader());
+        LPluginDexManager loader = LPluginDexManager.getClassLoader(plugin.getPluginPath(), LActivityProxy.this, getClassLoader());
         plugin.setPluginLoader(loader);
 
         String top = plugin.getTopActivityName();
@@ -248,27 +257,15 @@ public class LActivityProxy extends Activity implements LProxy {
             @Override
             public void uncaughtException(Thread thread, final Throwable ex) {
 
-                ex.printStackTrace();
+                Log.e("Direct-Load-APK-error",ex.getMessage());
+                LPluginError error = new LPluginError();
+                error.error = ex;
+                error.errorTime = System.currentTimeMillis();
+                error.errorThread = thread;
+                error.errorPlugin = remotePlugin;
+                error.processId = android.os.Process.myPid();
+                LPluginErrorManager.callAllErrorListener(error);
 
-                final Context context = Reflect.on("android.app.ActivityThread").call("currentActivityThread").call("getSystemContext").get();
-                new Thread() {
-                    @Override
-                    public void run() {
-                        Looper.prepare();
-                        Toast.makeText(context, "Sorry,the Plugin maybe met some error,so it will be crash:(\n", Toast.LENGTH_SHORT).show();
-                        Looper.loop();
-                    }
-                }.start();
-                try {
-                    Thread.sleep(2600);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                Thread.setDefaultUncaughtExceptionHandler(Thread.getDefaultUncaughtExceptionHandler());
-
-                android.os.Process.killProcess(android.os.Process.myPid());
-
-                System.exit(1);
 
 
             }
@@ -296,6 +293,7 @@ public class LActivityProxy extends Activity implements LProxy {
         if (!remotePlugin.isPluginInit()) {
             fillPlugin(remotePlugin);
         }
+        fillPluginLoader(remotePlugin);
 
         if (!remotePlugin.isPluginInit()) {
             throw new PluginCreateFailedException("Create Plugin failed!");
@@ -308,8 +306,6 @@ public class LActivityProxy extends Activity implements LProxy {
 
         remotePlugin.setControl(control);
         control.dispatchProxyToPlugin();
-        Reflect.on(remotePlugin.getCurrentPluginActivity()).call("attachBaseContext", LActivityProxy.this);
-        //setTitle(remotePlugin.getPluginPkgInfo().applicationInfo.loadLabel(getPackageManager()));
         try {
             control.callOnCreate(savedInstanceState);
             LCallbackManager.callAllOnCreate(savedInstanceState);
@@ -564,5 +560,89 @@ public class LActivityProxy extends Activity implements LProxy {
         return super.startService(service);
     }
 
-
+    //Finals 添加，修复Fragment点击返回的时候出现崩溃BUG
+     @Override
+    public void dump(String prefix, FileDescriptor fd, PrintWriter writer,String[] args) {
+        super.dump(prefix, fd, writer, args);
+    	if(remotePlugin==null){
+			return;
+		}
+    	PluginActivityCallback caller = remotePlugin.getControl();
+		if (caller != null) {
+			caller.callDump(prefix, fd, writer, args);
+		}
+    }
+     
+     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+    	super.onConfigurationChanged(newConfig);
+    	if(remotePlugin==null){
+			return;
+		}
+    	PluginActivityCallback caller = remotePlugin.getControl();
+		if (caller != null) {
+			caller.callOnConfigurationChanged();
+		}
+    }
+     
+    @Override
+    protected void onPostResume() {
+    	super.onPostResume();
+    	if(remotePlugin==null){
+			return;
+		}
+		PluginActivityCallback caller = remotePlugin.getControl();
+		if (caller != null) {
+			caller.callOnPostResume();
+		}
+    }
+    
+    @Override
+    public void onDetachedFromWindow() {
+    	if (remotePlugin == null) {
+			return;
+		}
+		PluginActivityCallback caller = remotePlugin.getControl();
+		if (caller != null) {
+			caller.callOnDetachedFromWindow();
+		}
+    	super.onDetachedFromWindow();
+    }
+    
+    @Override
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+    	if (remotePlugin == null) {
+			return super.onCreateView(name, context, attrs);
+		}
+		PluginActivityCallback caller = remotePlugin.getControl();
+		if (caller != null) {
+			return caller.callOnCreateView(name, context, attrs);
+		}
+    	return super.onCreateView(name, context, attrs);
+    }
+    
+    @Override
+    public View onCreateView(View parent, String name, Context context,
+    		AttributeSet attrs) {
+    	if (remotePlugin == null) {
+			return super.onCreateView(parent, name, context, attrs);
+		}
+		PluginActivityCallback caller = remotePlugin.getControl();
+		if (caller != null) {
+			return caller.callOnCreateView(parent, name, context, attrs);
+		}
+    	return super.onCreateView(parent, name, context, attrs);
+    }
+    
+    @Override
+    protected void onNewIntent(Intent intent) {
+    	super.onNewIntent(intent);
+    	if(remotePlugin==null){
+			return;
+		}
+		PluginActivityCallback caller = remotePlugin.getControl();
+		if (caller != null) {
+			caller.callOnNewIntent(intent);
+		}
+    }
 }
