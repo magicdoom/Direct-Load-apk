@@ -10,9 +10,9 @@
 * 开源实验室主页：[http://www.kymjs.com/DLA](http://www.kymjs.com/blog/2015/04/01/DLA.html)
 
 ## 使用方法
-1、你要确保你的插件的Manifest文件中只有Activity声明。
-2、在你的宿主APP中添加 **com.lody.plugin.LActivityProxy** 的Activity声明。
-3、在你想调用插件的代码处(仅限主线程)调用如下语句
+1、你要确保你的插件的Manifest文件中只有Activity声明。<br>
+2、在你的宿主APP中添加 **com.lody.plugin.LActivityProxy** 的Activity声明。<br>
+3、在你想调用插件的代码处(仅限主线程)调用如下语句<br>
 ```java
 /**
  * @param path 插件在手机中的绝对路径
