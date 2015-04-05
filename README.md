@@ -27,7 +27,7 @@ LPluginOpener.startPlugin(context,path);
 还有一个支持点是主题皮肤加载，这个也是我们接下来要努力做到的功能。<br>
 如果你还有其他的希望加入的需求，欢迎来[这里](http://jq.qq.com/?_wv=1027&k=SKRiD0)向我们反馈。<br>
 
-## 开源协议ApacheListener
+## 开源协议ApacheLicense
 
 Copyright 2015, Lody.
 
