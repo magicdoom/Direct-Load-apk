@@ -1,89 +1,50 @@
-Direct-load-apk
-===================
-![enter image description here](http://www.xiaoxiongbizhi.com/wallpapers/1152_864_85/u/x/uxcccgx3r.jpg)
+#Direct-Load-apk(DLA)简介
 
-Description
--------------
+[![开源实验室](https://github.com/FinalLody/Direct-Load-apk/blob/master/logo.png)](http://www.kymjs.com/)
 
-Direct - load - apk is a very powerful plugin framework, through it, you can make incredible thing ----- **load a normal apk as a plug-in directly without install it!** 
+## 一句话
+作为Android开发者，你尝试过运行一个没有安装过的APK吗？你尝试过没有任何约束的去启动一个APK吗？你尝试过不安装QQ微信就直接运行它们吗？很显然，这不可能实现。<br>
+好吧，说正事，DLA可以做到随时去运行一个apk，当然限制条件是有的，那就是这个没有安装APK的AndroidManifest中只有Activity的声明。<br>
 
-> **Advantage:** 
-> - Direct - load - apk can load all **Resources** from an apk which loaded as a plug-in. 
-> - Start a Service defined plug-in apk directly.
-> - Start a Activity defined plug-in apk directly.
-> - Start a Application defined plug-in apk directly.
-> - Support apk with so library.
-> - Support jumping between any Activities in plug-in apk . 
-> - Don't like "**[dynamic load - apk](https://github.com/singwhatiwanna/dynamic-load-apk)**" , [**"Direct - load - apk"**](https://github.com/asLody/Direct-load-apk) do not need to inherit the custom Activity, and can directly use `this` pointer. 
+## 相关连接
+* QQ群：[362901808](http://jq.qq.com/?_wv=1027&k=SKRiD0);[257053751](http://jq.qq.com/?_wv=1027&k=WoM2Aa)<br>
+* 开源中国git(优先更新)：[http://git.oschina.net/lody/Direct-load-apk](http://git.oschina.net/lody/Direct-load-apk)<br>
+* 开源实验室主页：[http://www.kymjs.com/DLA](http://www.kymjs.com/blog/2015/04/01/DLA.html)
 
-#### ***Usage***
+## 使用方法
+1、你要确保你的插件的Manifest文件中只有Activity声明。
+2、在你的宿主APP中添加 **com.lody.plugin.LActivityProxy** 的Activity声明。
+3、在你想调用插件的代码处(仅限主线程)调用如下语句
+```java
+/**
+ * @param path 插件在手机中的绝对路径
+ */
+LPluginOpener.startPlugin(context,path);
 
-Direct - load - apk is very convenient to use .You can write to start an APK likes this:
+```
+还有什么？没了！你完全可以把插件交给一个人开发，宿主APP交给一个人开发，这其中唯一的限制就是插件只能是Activity。
 
-    LPluginOpener.startPlugin(Context,Path);
+## 未来的支持
+如你所见，现在DLA只能加载Activity插件，并不支持其他三大组件。这是我们未来，不，是现在正在解决的一个技术点。<br>
+还有一个支持点是主题皮肤加载，这个也是我们接下来要努力做到的功能。<br>
+如果你还有其他的希望加入的需求，欢迎来[这里](http://jq.qq.com/?_wv=1027&k=SKRiD0)向我们反馈。<br>
 
-> **Tip:** Don't forget to write **com.lody.plugin.LActivityProxy** in AndroidManifest.xml.
+## 开源协议ApacheListener
 
-#### The development **Progress** and **TODO**
-> - Support complete Exception handler.
-> - Support Preference for plug-in apk.
-> - Support PackageManager for each plug-in apk.
-> - Support Theme in plug-in apk.
-> - Support Fragment.
+Copyright 2015, Lody.
 
-**Author**
--------------
-     Lody, from China, who is An ideal are ambitious young man.
-If you have any question , please send **Email** to here: **382816028@qq.com** , You can also Contact me through **QQ**:**382816028**.
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-##QQ GROUP:
-###362901808
+       http://www.apache.org/licenses/LICENSE-2.0
 
-
-#中文版
-
-Direct-load-apk
-===================
-描述
--------------
-
-Direct - load - apk 是一个强大的插件化框架, 通过使用它, 你可以实现看似不可能实现的功能 ----- **直接加载一个普通apk!** 
-
-> **优势:** 
-> - Direct - load - apk 能够加载插件的全部 **资源**. 
-> - 支持直接启动插件的Service.
-> - 支持直接启动插件的Activity.
-> - 支持直接启动插件的Application.
-> - 支持运行带有.so的apk.
-> - 支持 *插件间* Activity跳转. 
-> - 不像 **"[dynamic load - apk](https://github.com/singwhatiwanna/dynamic-load-apk)"** 这个项目, [**"Direct - load - apk"**](https://github.com/FinalLody/Direct-Load-apk/) 不需要对插件有任何约束，也不需要在插件中引入jar和继承自定义Activity，可以直接使用this指针。
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
 
-使用方法
----------------
-
-Direct - load - apk 的使用相当方便，可以像这样写:
-
-    LPluginOpener.startPlugin(Context,Path);
-
-> **提示:** 不要忘了在 AndroidManifest.xml 加入 **com.lody.plugin.LActivityProxy** .
-
-开发 **进度** 和 **未来将要做的**
-----------------------------------------------
-> - 未来将提供完整的插件异常处理机制。
-> - 未来将完善Preference机制。
-> - 未来将实现为插件定制的PackageManager。
-> - 未来将实现主题皮肤化机制。
-> - 未来将实现对Fragment的独立管理。
-
-**作者**
--------------
-     Lody, 一个富有开源精神和创造力的Android开发者。
-如果你有任何问题 , 可以发送 **Email** 到 *382816028@qq.com* , 也可以联系我的 *QQ* :382816028.
-
-##QQ 群:
-###362901808
-##GitHub:
-### https://github.com/FinalLody/Direct-Load-apk/
-##Direct-Load-apk原理篇：
-### http://my.oschina.net/u/2289564/blog/393252#OSC_h3_4
+## 作者
+lody，来自浙江宁波的Android开发者。乐于交友，善于分享。
