@@ -22,7 +22,7 @@ public class LFileTools {
      *
      * @param dataIns
      * @param target
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static void writeToFile(InputStream dataIns, File target) throws IOException {
         final int BUFFER = 1024;
@@ -41,7 +41,7 @@ public class LFileTools {
      * 从字节数组中写入文件
      * @param data
      * @param target
-     * @throws IOException
+     * @throws java.io.IOException
      */
     public static void writeToFile(byte[] data, File target) throws IOException {
         FileOutputStream fo = null;

@@ -3,6 +3,7 @@ package com.lody;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,11 +14,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.lody.plugin.LPluginOpener;
-import com.lody.plugin.api.LPluginError;
-import com.lody.plugin.api.LPluginErrorListener;
+import com.lody.plugin.api.LPluginBug;
+import com.lody.plugin.api.LPluginBugListener;
 import com.lody.plugin.control.PluginActivityCallback;
 import com.lody.plugin.manager.LCallbackManager;
-import com.lody.plugin.manager.LPluginErrorManager;
+import com.lody.plugin.manager.LPluginBugManager;
 import com.lody.sample.R;
 
 import java.io.File;
@@ -49,11 +50,11 @@ public class RunApkFromSdcard extends Activity {
                     Toast.makeText(RunApkFromSdcard.this,"所在路径没有文件！！",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                LPluginErrorManager.addErrorListener(new LPluginErrorListener() {
+                LPluginBugManager.addBugListener(new LPluginBugListener() {
                     @Override
-                    public void OnError(LPluginError error) {
+                    public void OnError(LPluginBug error) {
 
-                        Log.e("DEBUG",error.error.getMessage());
+                        Log.e("DEBUG", error.error.getMessage());
                         android.os.Process.killProcess(error.processId);
                         System.exit(1);
                     }
@@ -122,7 +123,7 @@ public class RunApkFromSdcard extends Activity {
                     }
 
                     @Override
-                    public void callOnConfigurationChanged() {
+                    public void callOnConfigurationChanged(Configuration newConfig) {
 
                     }
 

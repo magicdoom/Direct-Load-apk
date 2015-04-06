@@ -3,7 +3,7 @@ package com.lody.plugin;
 /**
  * Created by lody  on 2015/3/24.
  * <p/>
- * 插件的配置信息
+ * 保存插件的配置信息
  */
 public class LPluginConfig {
     /**

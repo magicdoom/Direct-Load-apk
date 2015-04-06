@@ -23,13 +23,22 @@ import java.util.zip.ZipFile;
 public class LSOUnpacker {
     
     public static final String TAG = LSOUnpacker.class.getSimpleName();
+    public static final String DEF_ARCH_1 = "armeabi";
+    public static final String DEF_ARCH_2 = "armeabi-v7a";
+    public static String ARCH = System.getProperty("os.arch");
+
     public static void unPackSOFromApk(String apkPath,String toPath){
+
+
+        Log.i(TAG,"CPU is "+ ARCH);
 
         try {
             ZipFile apk = new ZipFile(new File(apkPath));
             boolean hasLib = extractLibFile(apk,new File(toPath));
             if(hasLib){
-                Log.i(TAG,"The plugin is contains so files.");
+                Log.i(TAG,"The plugin is contains .so files.");
+            }else{
+                Log.i(TAG,"The plugin isn't contain any .so files.");
             }
 
 
@@ -42,13 +51,12 @@ public class LSOUnpacker {
     private static boolean extractLibFile(ZipFile zip, File to)
             throws ZipException, IOException {
 
-
-        String defaultArch = "armeabi";//默认为arm平台
         Map<String,List<ZipEntry>> archLibEntries = new HashMap<String, List<ZipEntry>>();
         for (Enumeration<? extends ZipEntry> e = zip.entries(); e
                 .hasMoreElements();) {
             ZipEntry entry = e.nextElement();
             String name = entry.getName();
+            //Log.i(TAG,"found file :" + name);
             if (name.startsWith("/")) {
                 name = name.substring(1);
             }
@@ -61,8 +69,9 @@ public class LSOUnpacker {
                 if (sp > 0) {
                     String osArch = name.substring(4, sp);
                     en2add=osArch.toLowerCase();
+                    Log.i(TAG,en2add);
                 } else {
-                    en2add=defaultArch;
+                    en2add=DEF_ARCH_1;
                 }
                 List<ZipEntry> zipEntries = archLibEntries.get(en2add);
                 if (zipEntries == null) {
@@ -72,10 +81,25 @@ public class LSOUnpacker {
                 zipEntries.add(entry);
             }
         }
-        String arch = System.getProperty("os.arch");//得到CPU信息
-        List<ZipEntry> libEntries = archLibEntries.get(arch.toLowerCase());
+         /*new EasyFor<List<ZipEntry>>(archLibEntries.values()) {
+
+             @Override
+             public void onNewElement(List<ZipEntry> element) {
+                 new EasyFor<ZipEntry>(element){
+                     @Override
+                     public void onNewElement(ZipEntry element) {
+                         Log.i(TAG,element.getName());
+                     }
+                 };
+             }
+         };*/
+
+        List<ZipEntry> libEntries = archLibEntries.get(ARCH.toLowerCase());
         if (libEntries == null) {
-            libEntries = archLibEntries.get(defaultArch);
+            libEntries = archLibEntries.get(DEF_ARCH_1);
+            if(libEntries == null){
+                libEntries = archLibEntries.get(DEF_ARCH_2);
+            }
         }
         boolean hasLib = false;//是否包含so
         if (libEntries != null) {

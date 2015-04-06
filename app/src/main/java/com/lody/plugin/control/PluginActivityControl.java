@@ -5,11 +5,14 @@ import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.lody.plugin.control.LPluginInstrument;
+import com.lody.plugin.control.PluginActivityCallback;
 import com.lody.plugin.reflect.Reflect;
 import com.lody.plugin.reflect.ReflectException;
 
@@ -63,36 +66,36 @@ public class PluginActivityControl implements PluginActivityCallback {
         try {
             //Finals 修改以前的注入方式，采用原生的方式
             Instrumentation instrumentation = proxyRef.get("mInstrumentation");
-        	pluginRef.call(
-        			// 方法名
-        					"attach",
-        					// Context context
-        					proxy,
-        					// ActivityThread aThread
-        					proxyRef.get("mMainThread"),
-        					// Instrumentation instr
-        					new LPluginInstrument(instrumentation),
-        					// IBinder token
-        					proxyRef.get("mToken"),
-        					// int ident
-        					proxyRef.get("mEmbeddedID") ==null ? 0:proxyRef.get("mEmbeddedID"),
-        					// Application application
-        					app == null ? proxy.getApplication() : app,
-        					// Intent intent
-        					proxy.getIntent(),
-        					// ActivityInfo info
-        					proxyRef.get("mActivityInfo"),
-        					// CharSequence title
-        					proxy.getTitle(),
-        					// Activity parent
-        					proxy.getParent(),
-        					// String id
-        					proxyRef.get("mEmbeddedID"),
-        					// NonConfigurationInstances lastNonConfigurationInstances
-        					proxy.getLastNonConfigurationInstance(),
-        					// Configuration config
-        					proxyRef.get("mCurrentConfig"));
-        	
+            pluginRef.call(
+                    // 方法名
+                    "attach",
+                    // Context context
+                    proxy,
+                    // ActivityThread aThread
+                    proxyRef.get("mMainThread"),
+                    // Instrumentation instr
+                    new LPluginInstrument(instrumentation),
+                    // IBinder token
+                    proxyRef.get("mToken"),
+                    // int ident
+                    proxyRef.get("mEmbeddedID") ==null ? 0:proxyRef.get("mEmbeddedID"),
+                    // Application application
+                    app == null ? proxy.getApplication() : app,
+                    // Intent intent
+                    proxy.getIntent(),
+                    // ActivityInfo info
+                    proxyRef.get("mActivityInfo"),
+                    // CharSequence title
+                    proxy.getTitle(),
+                    // Activity parent
+                    proxy.getParent(),
+                    // String id
+                    proxyRef.get("mEmbeddedID"),
+                    // NonConfigurationInstances lastNonConfigurationInstances
+                    proxy.getLastNonConfigurationInstance(),
+                    // Configuration config
+                    proxyRef.get("mCurrentConfig"));
+
             //TODO:开始伪装插件为实体Activity
 /*            pluginRef.set("mDecor", proxyRef.get("mDecor"));
             pluginRef.set("mTitleColor", proxyRef.get("mTitleColor"));
@@ -282,42 +285,42 @@ public class PluginActivityControl implements PluginActivityCallback {
     }
 
     //Finals ADD 修复Fragment BUG
-	@Override
-	public void callDump(String prefix, FileDescriptor fd, PrintWriter writer,
-			String[] args) {
-		 getPluginRef().call("dump",prefix,fd,writer,args);
-	}
+    @Override
+    public void callDump(String prefix, FileDescriptor fd, PrintWriter writer,
+                         String[] args) {
+        getPluginRef().call("dump",prefix,fd,writer,args);
+    }
 
-	@Override
-	public void callOnConfigurationChanged() {
-		getPluginRef().call("onConfigurationChanged");
-	}
+    @Override
+    public void callOnConfigurationChanged(Configuration newConfig) {
+        getPluginRef().call("onConfigurationChanged",newConfig);
+    }
 
-	@Override
-	public void callOnPostResume() {
-		getPluginRef().call("onPostResume");
-	}
+    @Override
+    public void callOnPostResume() {
+        getPluginRef().call("onPostResume");
+    }
 
-	@Override
-	public void callOnDetachedFromWindow() {
-		getPluginRef().call("onDetachedFromWindow");
-	}
+    @Override
+    public void callOnDetachedFromWindow() {
+        getPluginRef().call("onDetachedFromWindow");
+    }
 
-	@Override
-	public View callOnCreateView(String name, Context context,
-			AttributeSet attrs) {
-		return getPluginRef().call("onCreateView",name,context,attrs).get();
-	}
+    @Override
+    public View callOnCreateView(String name, Context context,
+                                 AttributeSet attrs) {
+        return getPluginRef().call("onCreateView",name,context,attrs).get();
+    }
 
-	@Override
-	public View callOnCreateView(View parent, String name, Context context,
-			AttributeSet attrs) {
-		return getPluginRef().call("onCreateView",parent,name,context,attrs).get();
-	}
+    @Override
+    public View callOnCreateView(View parent, String name, Context context,
+                                 AttributeSet attrs) {
+        return getPluginRef().call("onCreateView",parent,name,context,attrs).get();
+    }
 
-	@Override
-	public void callOnNewIntent(Intent intent) {
-		getPluginRef().call("onNewIntent");
-	}
+    @Override
+    public void callOnNewIntent(Intent intent) {
+        getPluginRef().call("onNewIntent");
+    }
 
 }

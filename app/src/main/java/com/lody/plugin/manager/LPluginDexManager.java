@@ -3,6 +3,7 @@ package com.lody.plugin.manager;
 import android.content.Context;
 
 import com.lody.plugin.LSOUnpacker;
+import com.lody.plugin.reflect.Reflect;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,10 +18,12 @@ import dalvik.system.DexClassLoader;
 public class LPluginDexManager extends DexClassLoader {
 
     private static final Map<String, LPluginDexManager> pluginLoader = new ConcurrentHashMap<String, LPluginDexManager>();
+    public static String finalApkPath;
 
     protected LPluginDexManager(String dexPath, String optimizedDirectory,
                                 String libraryPath, ClassLoader parent) {
         super(dexPath, optimizedDirectory, libraryPath, parent);
+        finalApkPath = dexPath;
         LSOUnpacker.unPackSOFromApk(dexPath,libraryPath);
     }
 
@@ -41,5 +44,10 @@ public class LPluginDexManager extends DexClassLoader {
             pluginLoader.put(dexPath, pluginDexLoader);
         }
         return pluginDexLoader;
+    }
+
+    public static ClassLoader getSystemLoader(){
+        Context context = Reflect.on("android.app.ActivityThread").call("currentActivityThread").call("getSystemContext").get();
+        return context == null ? null : context.getClassLoader();
     }
 }

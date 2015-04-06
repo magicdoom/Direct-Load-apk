@@ -29,7 +29,7 @@ public class LPluginOpener {
      * @param pluginPath
      * @param activityName 要启动的插件的activity名
      */
-    public static void startPlugin(Context context, String pluginPath,String activityName) {
+    public static void startActivity(Context context, String pluginPath,String activityName) {
         Intent i = new Intent(context, LActivityProxy.class);
         Bundle bundle = new Bundle();
         bundle.putString(LPluginConfig.KEY_PLUGIN_DEX_PATH, pluginPath);
@@ -45,11 +45,21 @@ public class LPluginOpener {
      * @param pluginPath
      * @param index  插件中的第几个Activity？
      */
-    public static void startPlugin(Context context, String pluginPath, int index) {
+    public static void startActivity(Context context, String pluginPath, int index) {
         Intent i = new Intent(context, LActivityProxy.class);
         Bundle bundle = new Bundle();
         bundle.putString(LPluginConfig.KEY_PLUGIN_DEX_PATH, pluginPath);
         i.putExtras(bundle);
         context.startActivity(i);
+    }
+
+    /**
+     * 启动插件中的指定service
+     * @param context
+     * @param pluginPath
+     * @param serviceName 要启动的插件的activity名
+     */
+    public static void startService(Context context, String pluginPath,String serviceName) {
+       //TODO:未完成
     }
 }

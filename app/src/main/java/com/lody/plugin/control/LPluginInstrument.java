@@ -8,10 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.lody.plugin.LActivityProxy;
 import com.lody.plugin.LPluginConfig;
-import com.lody.plugin.manager.LPluginManager;
+import com.lody.plugin.manager.LPluginDexManager;
 import com.lody.plugin.reflect.Reflect;
 
 /**
@@ -23,6 +24,9 @@ import com.lody.plugin.reflect.Reflect;
  * @see android.app.Activity#startActivity(android.content.Intent)
  */
 public class LPluginInstrument extends Instrumentation {
+
+
+    private static final String TAG = LPluginInstrument.class.getSimpleName();
     Instrumentation pluginIn;
     Reflect instrumentRef;
     public LPluginInstrument(Instrumentation pluginIn){
@@ -41,10 +45,34 @@ public class LPluginInstrument extends Instrumentation {
         }
         String className = componentName.getClassName();
         intent.setClass(who, LActivityProxy.class);
-        intent.putExtra(LPluginConfig.KEY_PLUGIN_DEX_PATH, LPluginManager.finalApkPath);
+
+        Log.i(TAG,"Jump to " + className + "[" + LPluginDexManager.finalApkPath +"]");
+
+        intent.putExtra(LPluginConfig.KEY_PLUGIN_DEX_PATH, LPluginDexManager.finalApkPath);
         intent.putExtra(LPluginConfig.KEY_PLUGIN_ACT_NAME,className);
 
         return instrumentRef.call("execStartActivity",who,contextThread,token,target,intent,requestCode,options).get();
+
+    }
+
+    /**@Override*/
+    public ActivityResult execStartActivity(
+            Context who, IBinder contextThread, IBinder token, Activity target,
+            Intent intent, int requestCode) {
+
+        ComponentName componentName = intent.getComponent();
+        if(componentName == null){
+            return instrumentRef.call("execStartActivity",who,contextThread,token,target,intent,requestCode).get();
+        }
+        String className = componentName.getClassName();
+        intent.setClass(who, LActivityProxy.class);
+
+        Log.i(TAG,"Jump to " + className + "[" + LPluginDexManager.finalApkPath +"]");
+
+        intent.putExtra(LPluginConfig.KEY_PLUGIN_DEX_PATH, LPluginDexManager.finalApkPath);
+        intent.putExtra(LPluginConfig.KEY_PLUGIN_ACT_NAME,className);
+
+        return instrumentRef.call("execStartActivity",who,contextThread,token,target,intent,requestCode).get();
 
     }
 
@@ -65,7 +93,6 @@ public class LPluginInstrument extends Instrumentation {
 
     @Override
     public boolean onException(Object obj, Throwable e) {
-
         return pluginIn.onException(obj,e);
     }
 

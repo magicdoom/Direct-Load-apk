@@ -1,7 +1,7 @@
 package com.lody.plugin;
 
 import android.app.Activity;
-import android.app.Application;
+import com.lody.plugin.control.PluginActivityControl;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,87 +14,50 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
-import com.lody.plugin.api.LPluginError;
-import com.lody.plugin.bean.LPlugin;
+import com.lody.plugin.api.LPluginBug;
+import com.lody.plugin.bean.LActivityPlugin;
 import com.lody.plugin.control.PluginActivityCallback;
-import com.lody.plugin.control.PluginActivityControl;
 import com.lody.plugin.exception.LaunchPluginException;
 import com.lody.plugin.exception.NotFoundPluginException;
 import com.lody.plugin.exception.PluginCreateFailedException;
 import com.lody.plugin.exception.PluginNotExistException;
+import com.lody.plugin.manager.LApkManager;
 import com.lody.plugin.manager.LCallbackManager;
-import com.lody.plugin.manager.LPluginDexManager;
-import com.lody.plugin.manager.LPluginErrorManager;
-import com.lody.plugin.manager.LPluginManager;
-import com.lody.plugin.reflect.Reflect;
-import com.lody.plugin.service.LServiceProxy;
+import com.lody.plugin.manager.LPluginBugManager;
 
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
-
-import dalvik.system.DexClassLoader;
 
 /**
  * Created by lody  on 2015/3/27.
  */
 public class LActivityProxy extends Activity implements ILoadPlugin {
 
-    public LPlugin remotePlugin;
+    private static final String TAG = LActivityProxy.class.getSimpleName();
+    private LActivityPlugin remotePlugin;
     boolean meetBUG = false;
 
     @Override
-    public LPlugin loadPlugin(Activity ctx, String apkPath) {
+    public LActivityPlugin loadPlugin(Activity ctx, String apkPath) {
         //插件必须要确认有没有经过初始化，不然只是空壳
-
-        return loadPlugin(ctx, apkPath, true);
+        remotePlugin = new LActivityPlugin(ctx, apkPath);
+        return remotePlugin;
 
     }
 
     @Override
-    public LPlugin loadPlugin(Activity ctx, String apkPath, boolean checkInit) {
-        LPlugin plugin = LPluginManager.loadPlugin(ctx, apkPath);
-
-
-        if (checkInit) {
-            if (!plugin.isPluginInit()) {
-                fillPlugin(plugin);
-            }
-        }
-        return plugin;
-    }
-
-    @Override
-    public LPlugin loadPlugin(Activity ctx, String apkPath, String activityName) {
-        LPlugin plugin = loadPlugin(ctx, apkPath, false);
+    public LActivityPlugin loadPlugin(Activity ctx, String apkPath, String activityName) {
+        LActivityPlugin plugin = loadPlugin(ctx, apkPath);
         plugin.setTopActivityName(activityName);
         fillPlugin(plugin);
         return plugin;
     }
 
-    @Override
-    public LPlugin loadPlugin(Activity ctx, String apkPath, int index) {
-        LPlugin plugin = loadPlugin(ctx, apkPath, false);
-        if (plugin.isPluginInit()) {
-            plugin.setTopActivityName(plugin.getActivityInfos()[index].name);
-            fillPlugin(plugin);
-        } else {
-            try {
-                PackageInfo info = LPluginTool.getAppInfo(this, apkPath);
-                String name = info.activities[index].name;
-                plugin.setTopActivityName(name);
-                fillPlugin(plugin);
-            } catch (PackageManager.NameNotFoundException e) {
-                throw new PluginNotExistException();
-            }
-
-        }
-
-        return plugin;
-    }
 
     /**
      * 装载插件
@@ -102,30 +65,39 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
      * @param plugin
      */
     @Override
-    public void fillPlugin(LPlugin plugin) {
+    public void fillPlugin(LActivityPlugin plugin) {
         if (plugin == null) {
-            throw new PluginNotExistException();
+            throw new PluginNotExistException("Plugin is null!");
         }
         String apkPath = plugin.getPluginPath();
         File apk = new File(apkPath);
         if (!apk.exists()) throw new NotFoundPluginException(apkPath);
-        apk = null;
-        fillPluginRes(plugin);
-        if (!plugin.isOver()) {
-            fillPluginInfo(plugin);
+
+        if (!this.remotePlugin.from().canUse()) {
+            Log.i(TAG, "Plugin is not been init,init it now！");
+            LApkManager.initApk(plugin.from(),this,super.getResources());
+            remotePlugin.from().debug();
+
+        } else {
+            Log.i(TAG, "Plugin have been init.");
         }
-        fillPluginLoader(plugin);
-        //Finals fix On 2015/3/31
         fillPluginTheme(plugin);
-        fillPluginApplication(plugin);
+        fillPluginActivity(plugin);
 
 
     }
 
-    private void fillPluginTheme(LPlugin plugin) {
+    private void fillPluginTheme(LActivityPlugin plugin) {
 
-        PackageInfo packageInfo = plugin.getPluginPkgInfo();
+        Resources.Theme pluginTheme = plugin.from().pluginRes.newTheme();
+        pluginTheme.setTo(super.getTheme());
+        plugin.setTheme(pluginTheme);
+
+        PackageInfo packageInfo = plugin.from().pluginPkgInfo;
         String mClass = plugin.getTopActivityName();
+
+        Log.i(TAG, "Before fill Plugin 's Theme,We check the plugin:info = " + packageInfo + "topActivityName = " + mClass);
+
         int defaultTheme = packageInfo.applicationInfo.theme;
         ActivityInfo curActivityInfo = null;
         for (ActivityInfo a : packageInfo.activities) {
@@ -146,78 +118,41 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
                 break;
             }
         }
-        //修复部分机型渲染布局在#31出现LayoutInflateException
-        plugin.getCurrentPluginTheme().applyStyle(defaultTheme, true);
+        Log.i(TAG,"Plugin theme = " + plugin.getTheme());
+        plugin.getTheme().applyStyle(defaultTheme, true);
         setTheme(defaultTheme);
         if (curActivityInfo != null) {
             getWindow().setSoftInputMode(curActivityInfo.softInputMode);
         }
 
-        if(LPluginConfig.usePluginTitle){
+        if (LPluginConfig.usePluginTitle) {
             CharSequence title = null;
             try {
-                title = LPluginTool.getAppName(this,plugin.getPluginPath());
+                title = LPluginTool.getAppName(this, plugin.getPluginPath());
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
-            if(title != null) setTitle(title);
+            if (title != null) setTitle(title);
         }
+
 
 
     }
 
-    private void fillPluginApplication(LPlugin plugin) {
-        String appName = plugin.getAppName();
-        if (appName == null) return;
-        if (appName.isEmpty()) return;
-
-        ClassLoader loader = plugin.getPluginLoader();
-        if (loader == null) throw new PluginCreateFailedException();
-        try {
-            Application pluginApp = (Application) loader.loadClass(appName).newInstance();
-            Reflect.on(pluginApp).call("attach", getApplicationContext());
-            plugin.bindPluginApp(pluginApp);
-
-        } catch (InstantiationException e) {
-            //throw new PluginCreateFailedException(e.getMessage());
-        } catch (IllegalAccessException e) {
-            //throw new PluginCreateFailedException(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            //throw new PluginCreateFailedException(e.getMessage());
-        }
-
-
-    }
-
-    /**
-     * 装载插件加载器
-     *
-     * @param plugin
-     */
-    private void fillPluginLoader(LPlugin plugin) {
-
-
-        DexClassLoader loader = null;
-        if((loader = plugin.getPluginLoader()) == null){
-            loader = LPluginDexManager.getClassLoader(plugin.getPluginPath(), LActivityProxy.this, getClassLoader());
-            plugin.setPluginLoader(loader);
-        }
-
-        String top = plugin.getTopActivityName();
-        if (top == null) {
-            top = plugin.getActivityInfos()[0].name;
-            plugin.setTopActivityName(top);
-        }
-        fillPluginActivity(plugin);
-    }
 
     /**
      * 装载插件的Activity
+     *
      * @param plugin
      */
-    private void fillPluginActivity(LPlugin plugin) {
+    private void fillPluginActivity(LActivityPlugin plugin) {
         try {
-            Activity myPlugin = (Activity) plugin.getPluginLoader().loadClass(plugin.getTopActivityName()).newInstance();
+            String top = plugin.getTopActivityName();
+            if (top == null) {
+                top = plugin.from().pluginPkgInfo.activities[0].name;
+                plugin.setTopActivityName(top);
+            }
+            Activity myPlugin = (Activity) plugin.from().pluginLoader.loadClass(plugin.getTopActivityName()).newInstance();
             plugin.setCurrentPluginActivity(myPlugin);
 
         } catch (Exception e) {
@@ -225,51 +160,8 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
         }
     }
 
-    /**
-     * 注册插件信息
-     *
-     * @param plugin
-     */
-    private void fillPluginInfo(LPlugin plugin) {
-        PackageInfo info = null;
-        try {
-            info = LPluginTool.getAppInfo(LActivityProxy.this, plugin.getPluginPath());
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new PluginNotExistException(plugin.getPluginPath());
-        }
-        if (info == null) {
-            throw new PluginCreateFailedException("Can't create Plugin from :" + plugin.getPluginPath());
-        }
-        plugin.setPluginPkgInfo(info);
-        plugin.setAppName(info.applicationInfo.className);
-        plugin.setOver(true);
 
-    }
 
-    /**
-     * 装载插件资源
-     *
-     * @param plugin
-     */
-    private void fillPluginRes(LPlugin plugin) {
-        try {
-            AssetManager assetManager = AssetManager.class.newInstance();
-            Reflect assetRef = Reflect.on(assetManager);
-            assetRef.call("addAssetPath", plugin.getPluginPath());
-            plugin.setPluginAssetManager(assetManager);
-            Resources superRes = super.getResources();
-            Resources pluginRes = new Resources(assetManager,
-                    superRes.getDisplayMetrics(),
-                    superRes.getConfiguration());
-            plugin.setPluginRes(pluginRes);
-            Resources.Theme pluginTheme = plugin.getPluginRes().newTheme();
-            pluginTheme.setTo(super.getTheme());
-            plugin.setCurrentPluginTheme(pluginTheme);
-
-        } catch (Exception e) {
-
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -279,13 +171,13 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
             @Override
             public void uncaughtException(Thread thread, final Throwable ex) {
 
-                LPluginError error = new LPluginError();
-                error.error = ex;
-                error.errorTime = System.currentTimeMillis();
-                error.errorThread = thread;
-                error.errorPlugin = remotePlugin;
-                error.processId = android.os.Process.myPid();
-                LPluginErrorManager.callAllErrorListener(error);
+                LPluginBug bug = new LPluginBug();
+                bug.error = ex;
+                bug.errorTime = System.currentTimeMillis();
+                bug.errorThread = thread;
+                bug.errorPlugin = remotePlugin;
+                bug.processId = android.os.Process.myPid();
+                LPluginBugManager.callAllErrorListener(bug);
 
 
 
@@ -293,6 +185,7 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
         });
         super.onCreate(savedInstanceState);
         final Bundle pluginMessage = getIntent().getExtras();
+
         String pluginActivityName;
         String pluginDexPath;
         //int pluginIndex;
@@ -307,22 +200,16 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
             throw new PluginCreateFailedException("Please put the Plugin Path!");
         }
 
-        remotePlugin = loadPlugin(LActivityProxy.this, pluginDexPath, false);
+        remotePlugin = loadPlugin(LActivityProxy.this, pluginDexPath);
+
         if (pluginActivityName != LPluginConfig.DEF_PLUGIN_CLASS_NAME) {
             remotePlugin.setTopActivityName(pluginActivityName);
         }
 
-        if (!remotePlugin.isPluginInit()) {
-            fillPlugin(remotePlugin);
-        }
+        fillPlugin(remotePlugin);
+        //remotePlugin.from().debug();
 
-        if (!remotePlugin.isPluginInit()) {
-            throw new PluginCreateFailedException("Create Plugin failed!");
-        }
-
-
-        PluginActivityControl control = new PluginActivityControl(LActivityProxy.this, remotePlugin.getCurrentPluginActivity(), remotePlugin.getPluginApplication());
-
+        PluginActivityControl control = new PluginActivityControl(LActivityProxy.this, remotePlugin.getCurrentPluginActivity(), remotePlugin.from().pluginApplication);
         remotePlugin.setControl(control);
         control.dispatchProxyToPlugin();
         try {
@@ -336,7 +223,7 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     }
 
     private void processError(Exception e) {
-
+        e.printStackTrace();
         //Not use yet
     }
 
@@ -345,21 +232,21 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     public Resources getResources() {
         if (remotePlugin == null)
             return super.getResources();
-        return remotePlugin.getPluginRes() == null ? super.getResources() : remotePlugin.getPluginRes();
+        return remotePlugin.from().pluginRes == null ? super.getResources() : remotePlugin.from().pluginRes;
     }
 
     @Override
     public Resources.Theme getTheme() {
         if (remotePlugin == null)
             return super.getTheme();
-        return remotePlugin.getCurrentPluginTheme() == null ? super.getTheme() : remotePlugin.getCurrentPluginTheme();
+        return remotePlugin.getTheme() == null ? super.getTheme() : remotePlugin.getTheme();
     }
 
     @Override
     public AssetManager getAssets() {
         if (remotePlugin == null)
             return super.getAssets();
-        return remotePlugin.getPluginAssetManager() == null ? super.getAssets() : remotePlugin.getPluginAssetManager();
+        return remotePlugin.from().pluginAssets == null ? super.getAssets() : remotePlugin.from().pluginAssets;
     }
 
 
@@ -368,8 +255,8 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
         if (remotePlugin == null) {
             return super.getClassLoader();
         }
-        if (remotePlugin.isPluginInit()) {
-            return remotePlugin.getPluginLoader();
+        if (remotePlugin.from().canUse()) {
+            return remotePlugin.from().pluginLoader;
         }
         return super.getClassLoader();
     }
@@ -453,8 +340,6 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     }
 
 
-
-
     //Lody~
     //FIX ME:序列化和反序列化暂时工作不正常，
     //原因是序列化使用的类加载器不包含插件的类。
@@ -508,7 +393,7 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
         if (remotePlugin == null) {
             super.onBackPressed();
         }
-        if(meetBUG){
+        if (meetBUG) {
             //这种情况下，应该立即退出插件，不然Activity将会阻塞
             android.os.Process.killProcess(android.os.Process.myPid());
             System.exit(1);
@@ -587,18 +472,16 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     @Override
     public ComponentName startService(Intent service) {
         //TODO:转移Service跳转目标
-        service.setClass(this, LServiceProxy.class);
-        String className = service.getComponent().getClassName();
-        remotePlugin.setCurrentServiceClassName(className);
+        //暂未实现，实现只是时间问题
+
 
         return super.startService(service);
     }
 
-    //Finals 添加，修复Fragment点击返回的时候出现崩溃BUG
     @Override
-    public void dump(String prefix, FileDescriptor fd, PrintWriter writer,String[] args) {
+    public void dump(String prefix, FileDescriptor fd, PrintWriter writer, String[] args) {
         super.dump(prefix, fd, writer, args);
-        if(remotePlugin==null){
+        if (remotePlugin == null) {
             return;
         }
         PluginActivityCallback caller = remotePlugin.getControl();
@@ -610,19 +493,19 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if(remotePlugin==null){
+        if (remotePlugin == null) {
             return;
         }
         PluginActivityCallback caller = remotePlugin.getControl();
         if (caller != null) {
-            caller.callOnConfigurationChanged();
+            caller.callOnConfigurationChanged(newConfig);
         }
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        if(remotePlugin==null){
+        if (remotePlugin == null) {
             return;
         }
         PluginActivityCallback caller = remotePlugin.getControl();
@@ -671,7 +554,7 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if(remotePlugin==null){
+        if (remotePlugin == null) {
             return;
         }
         PluginActivityCallback caller = remotePlugin.getControl();
@@ -683,9 +566,11 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(remotePlugin == null){
+        if (remotePlugin == null) {
             return;
         }
-       remotePlugin.getControl().getPluginRef().call("onActivityResult",requestCode,resultCode,data);
+        remotePlugin.getControl().getPluginRef().call("onActivityResult", requestCode, resultCode, data);
     }
+
+
 }
