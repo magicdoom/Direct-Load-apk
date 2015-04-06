@@ -1,8 +1,8 @@
 [![开源实验室](https://github.com/FinalLody/Direct-Load-apk/blob/master/logo.png)](http://www.kymjs.com/)<h2>Direct-Load-apk(DLA)简介</h2>
 
 ## 一句话
-作为Android开发者，你尝试过运行一个没有安装过的APK吗？你尝试过没有任何约束的去启动一个APK吗？你尝试过不安装QQ微信就直接运行它们吗？很显然，这不可能实现。<br>
-好吧，说正事，DLA可以做到随时去运行一个apk，当然限制条件是有的，那就是这个没有安装APK的AndroidManifest中只有Activity的声明。<br>
+作为Android开发者，你尝试过运行一个没有安装过的APK吗？你尝试过没有任何约束的去启动一个APK吗？你尝试过不安装QQ微信就直接运行它们吗？很显然，这目前不可能实现。<br>
+好吧，说正事，DLA可以做到随时去运行一个apk，而不需要有什么约束，你甚至指定类名来启动插件中的任意Activity。<br>
 
 ## 相关连接
 * QQ群：[362901808](http://jq.qq.com/?_wv=1027&k=SKRiD0);[257053751](http://jq.qq.com/?_wv=1027&k=WoM2Aa)<br>
