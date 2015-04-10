@@ -32,6 +32,7 @@ import com.lody.plugin.manager.LPluginBugManager;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import com.lody.plugin.service.*;
 
 /**
  * Created by lody  on 2015/3/27.
@@ -75,7 +76,7 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
 
         if (!this.remotePlugin.from().canUse()) {
             Log.i(TAG, "Plugin is not been init,init it now！");
-            LApkManager.initApk(plugin.from(),this,super.getResources());
+            LApkManager.initApk(plugin.from(),this);
             remotePlugin.from().debug();
 
         } else {
@@ -472,10 +473,9 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     @Override
     public ComponentName startService(Intent service) {
         //TODO:转移Service跳转目标
-        //暂未实现，实现只是时间问题
-
-
-        return super.startService(service);
+		LProxyService .SERVICE_CLASS_NAME = service.getComponent().getClassName();
+		service.setClass(this,LProxyService .class);
+		  return super.startService(service);
     }
 
     @Override

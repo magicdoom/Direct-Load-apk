@@ -12,6 +12,7 @@
 ## 使用方法
 1、你要确保你的插件的Manifest文件中只有Activity声明。<br>
 2、在你的宿主APP中添加 **com.lody.plugin.LActivityProxy** 的Activity声明。<br>
+2、在你的宿主APP中添加 **com.lody.plugin.service.LProxyService** 的Service声明。<br>
 3、在你想调用插件的代码处(仅限主线程)调用如下语句<br>
 ```java
 /**
@@ -32,7 +33,7 @@ LPluginOpener.startActivity(context,path,activityClassName);
 还有什么？没了！你完全可以把插件交给一个人开发，宿主APP交给一个人开发。
 
 ## 未来的支持
-如你所见，现在DLA已经能够加载插件中的Activity，而其它三大组件的支持，只是时间问题。<br>
+如你所见，现在DLA已经能够加载插件中的Activity和Service，而其它组件的支持，只是时间问题。<br>
 还有一个支持点是主题皮肤加载，这个也是我们接下来要努力做到的功能。<br>
 如果你还有其他的希望加入的需求，欢迎来[这里](http://jq.qq.com/?_wv=1027&k=SKRiD0)向我们反馈。<br>
 

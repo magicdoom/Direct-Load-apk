@@ -32,5 +32,9 @@ public class LPluginConfig {
      * 是否使用插件的标题
      */
     public static boolean usePluginTitle = true;
+	/**
+	 * ProxyService需要托管新的Service
+	 */
+	public static boolean FLAG_NEW_SERVICE;
 
 }

@@ -40,7 +40,7 @@ public final class LApkManager {
         return apk;
     }
 
-    public static void initApk(LAPK apk ,Context ctx,Resources superRes){
+    public static void initApk(LAPK apk ,Context ctx){
         String apkPath = apk.pluginPath;
         File file = new File(apkPath);
         if (!file.exists()) throw new NotFoundPluginException(apkPath);
