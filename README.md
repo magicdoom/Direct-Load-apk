@@ -2,7 +2,7 @@
 
 ## 一句话
 作为Android开发者，你尝试过运行一个没有安装过的APK吗？你尝试过没有任何约束的去启动一个APK吗？ <br>
-DLA就是一个实现此功能的强大插件化框架,可以做到随时去运行一个未安装的apk，而不需要有什么约束，你甚至可以指定类名来启动插件中的任意Activity或Service!<br>
+DLA就是一个实现此功能的强大插件化框架,可以做到随时运行一个未安装的apk，而不需要有什么约束，你甚至可以指定类名来启动插件中的任意Activity或Service!<br>
 
 ## 相关连接
 * QQ群：[362901808](http://jq.qq.com/?_wv=1027&k=SKRiD0)（DLA）;[257053751](http://jq.qq.com/?_wv=1027&k=WoM2Aa) （KJFrame）<br>
@@ -10,8 +10,7 @@ DLA就是一个实现此功能的强大插件化框架,可以做到随时去运�
 * 开源实验室主页：[http://www.kymjs.com/DLA](http://www.kymjs.com/blog/2015/04/01/DLA.html)
 
 ## 使用方法
-1、你要确保你的插件的Manifest文件中只有Activity声明。<br>
-2、在你的宿主APP中添加 **com.lody.plugin.LActivityProxy** 的Activity声明。<br>
+1、在你的宿主APP中添加 **com.lody.plugin.LActivityProxy** 的Activity声明。<br>
 2、在你的宿主APP中添加 **com.lody.plugin.service.LProxyService** 的Service声明。<br>
 3、在你想调用插件的代码处(仅限主线程)调用如下语句<br>
 ```java
@@ -21,7 +20,7 @@ DLA就是一个实现此功能的强大插件化框架,可以做到随时去运�
 LPluginOpener.startPlugin(context,path);
 
 ```
-如果你想启动apk中的某个Activity，你可以调用以下语句<br>
+如果你只想启动apk中的某个Activity，你可以调用以下语句<br>
 ```java
 /**
  * @param path 插件在手机中的绝对路径
@@ -30,7 +29,7 @@ LPluginOpener.startPlugin(context,path);
 LPluginOpener.startActivity(context,path,activityClassName);
 
 ```
-如果你想启动apk中的某个Service，你可以调用以下语句<br>
+如果你只想启动apk中的某个Service，你可以调用以下语句<br>
 ```java
 /**
  * @param path 插件在手机中的绝对路径
