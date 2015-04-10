@@ -3,6 +3,7 @@ package com.lody.plugin;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import com.lody.plugin.service.*;
 
 /**
  * Created by lody  on 2015/3/24.
@@ -38,20 +39,6 @@ public class LPluginOpener {
         context.startActivity(i);
     }
 
-    /**
-     * 直接启动一个apk
-     *
-     * @param context
-     * @param pluginPath
-     * @param index  插件中的第几个Activity？
-     */
-    public static void startActivity(Context context, String pluginPath, int index) {
-        Intent i = new Intent(context, LActivityProxy.class);
-        Bundle bundle = new Bundle();
-        bundle.putString(LPluginConfig.KEY_PLUGIN_DEX_PATH, pluginPath);
-        i.putExtras(bundle);
-        context.startActivity(i);
-    }
 
     /**
      * 启动插件中的指定service
@@ -60,6 +47,9 @@ public class LPluginOpener {
      * @param serviceName 要启动的插件的activity名
      */
     public static void startService(Context context, String pluginPath,String serviceName) {
-       //TODO:未完成
+		Intent i = new Intent(context, LProxyService.class);
+		LProxyService.SERVICE_APK_PATH = pluginPath;
+		LProxyService.SERVICE_CLASS_NAME = serviceName;
+		context.startService(i);
     }
 }

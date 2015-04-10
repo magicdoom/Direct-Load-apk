@@ -169,21 +169,21 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
 
 
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread thread, final Throwable ex) {
+				@Override
+				public void uncaughtException(Thread thread, final Throwable ex) {
 
-                LPluginBug bug = new LPluginBug();
-                bug.error = ex;
-                bug.errorTime = System.currentTimeMillis();
-                bug.errorThread = thread;
-                bug.errorPlugin = remotePlugin;
-                bug.processId = android.os.Process.myPid();
-                LPluginBugManager.callAllErrorListener(bug);
+					LPluginBug bug = new LPluginBug();
+					bug.error = ex;
+					bug.errorTime = System.currentTimeMillis();
+					bug.errorThread = thread;
+					bug.errorPlugin = remotePlugin;
+					bug.processId = android.os.Process.myPid();
+					LPluginBugManager.callAllErrorListener(bug);
 
 
 
-            }
-        });
+				}
+			});
         super.onCreate(savedInstanceState);
         final Bundle pluginMessage = getIntent().getExtras();
 
@@ -346,47 +346,47 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     //原因是序列化使用的类加载器不包含插件的类。
     //
 
-/*    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (remotePlugin == null) {
-            return;
-        }
-        PluginActivityCallback caller = remotePlugin.getControl();
-        if (caller != null) {
-            if (!meetBUG) {
-                try {
-                    caller.callOnSaveInstanceState(outState);
-                    LCallbackManager.callAllOnSaveInstanceState(outState);
-                } catch (Exception e) {
-                    meetBUG = true;
-                    processError(e);
-                }
-            }
-        }
-    }*/
+	/*    @Override
+	 protected void onSaveInstanceState(Bundle outState) {
+	 super.onSaveInstanceState(outState);
+	 if (remotePlugin == null) {
+	 return;
+	 }
+	 PluginActivityCallback caller = remotePlugin.getControl();
+	 if (caller != null) {
+	 if (!meetBUG) {
+	 try {
+	 caller.callOnSaveInstanceState(outState);
+	 LCallbackManager.callAllOnSaveInstanceState(outState);
+	 } catch (Exception e) {
+	 meetBUG = true;
+	 processError(e);
+	 }
+	 }
+	 }
+	 }*/
 
-/*    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (remotePlugin == null) {
-            return;
-        }
-        PluginActivityCallback caller = remotePlugin.getControl();
-        if (caller != null) {
-            if (!meetBUG) {
-                try {
-                    caller.callOnRestoreInstanceState(savedInstanceState);
-                    LCallbackManager.callAllOnRestoreInstanceState(savedInstanceState);
-                } catch (Exception e) {
-                    meetBUG = true;
-                    processError(e);
-                }
+	/*    @Override
+	 protected void onRestoreInstanceState(Bundle savedInstanceState) {
+	 super.onRestoreInstanceState(savedInstanceState);
+	 if (remotePlugin == null) {
+	 return;
+	 }
+	 PluginActivityCallback caller = remotePlugin.getControl();
+	 if (caller != null) {
+	 if (!meetBUG) {
+	 try {
+	 caller.callOnRestoreInstanceState(savedInstanceState);
+	 LCallbackManager.callAllOnRestoreInstanceState(savedInstanceState);
+	 } catch (Exception e) {
+	 meetBUG = true;
+	 processError(e);
+	 }
 
-            }
-        }
+	 }
+	 }
 
-    }*/
+	 }*/
 
     @Override
     public void onBackPressed() {
@@ -473,9 +473,9 @@ public class LActivityProxy extends Activity implements ILoadPlugin {
     @Override
     public ComponentName startService(Intent service) {
         //TODO:转移Service跳转目标
-		LProxyService .SERVICE_CLASS_NAME = service.getComponent().getClassName();
-		service.setClass(this,LProxyService .class);
-		  return super.startService(service);
+		LProxyService.SERVICE_CLASS_NAME = service.getComponent().getClassName();
+		service.setClass(this,LProxyService.class);
+        return super.startService(service);
     }
 
     @Override

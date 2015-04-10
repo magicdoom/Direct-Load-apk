@@ -7,12 +7,14 @@ import android.os.*;
 import com.lody.plugin.bean.*;
 import com.lody.plugin.manager.*;
 import com.lody.plugin.reflect.*;
+import com.lody.plugin.*;
 
 public class LProxyService  extends Service
 {
 
 	LServicePlugin remote;
-	public static String SERVICE_CLASS_NAME;
+	public static String SERVICE_CLASS_NAME = Service.class.getName();
+	public static String SERVICE_APK_PATH = LPluginDexManager.finalApkPath;
 	@Override
 	public IBinder onBind(Intent i)
 	{
@@ -23,10 +25,9 @@ public class LProxyService  extends Service
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		// TODO: Implement this method
-		//Toast.makeText(this,"插件的onStartCommand被执行!",1).show();
-		if(!SERVICE_CLASS_NAME.equals(intent.getComponent().getClassName())){
-			onCreate();
+		if(!remote.getCurrentPluginService().getClass().getName().equals(SERVICE_CLASS_NAME)){
+			fillService();
+			remote.getCurrentPluginService().onCreate();
 		}
 		return remote.getCurrentPluginService().onStartCommand(intent,flags,startId);
 	}
@@ -34,15 +35,7 @@ public class LProxyService  extends Service
 	@Override
 	public void onCreate()
 	{
-		// TODO: Implement this method
 		super.onCreate();
-		//Toast.makeText(this,"插件的Service已经启动!",1).show();
-
-		remote = new LServicePlugin(this,LPluginDexManager.finalApkPath);
-		remote.setTopServiceName(SERVICE_CLASS_NAME);
-		if(!remote.from().canUse()){
-			LApkManager.initApk(remote.from(),this);
-		}
 
 		fillService();
 		remote.getCurrentPluginService().onCreate();
@@ -50,6 +43,11 @@ public class LProxyService  extends Service
 
 	private void fillService()
 	{
+		remote = new LServicePlugin(this,SERVICE_APK_PATH);
+		remote.setTopServiceName(SERVICE_CLASS_NAME);
+		if(!remote.from().canUse()){
+			LApkManager.initApk(remote.from(),this);
+		}
 		try
 		{
 
@@ -71,8 +69,6 @@ public class LProxyService  extends Service
 	@Override
 	public void onStart(Intent intent, int startId)
 	{
-		// TODO: Implement this method
-		//Toast.makeText(this,"插件的onStart被执行!",1).show();
 		super.onStart(intent, startId);
 		remote.getCurrentPluginService().onStart(intent,startId);
 	}
@@ -80,7 +76,7 @@ public class LProxyService  extends Service
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
-		// TODO: Implement this method
+		
 		super.onConfigurationChanged(newConfig);
 		remote.getCurrentPluginService().onConfigurationChanged(newConfig);
 	}
@@ -88,7 +84,7 @@ public class LProxyService  extends Service
 	@Override
 	public boolean onUnbind(Intent intent)
 	{
-		// TODO: Implement this method
+		
 		return remote.getCurrentPluginService().onUnbind(intent);
 
 	}
@@ -96,7 +92,7 @@ public class LProxyService  extends Service
 	@Override
 	public void onDestroy()
 	{
-		// TODO: Implement this method
+		
 		super.onDestroy();
 		remote.getCurrentPluginService().onDestroy();
 	}
@@ -104,7 +100,7 @@ public class LProxyService  extends Service
 	@Override
 	public void onRebind(Intent intent)
 	{
-		// TODO: Implement this method
+		
 		super.onRebind(intent);
 		remote.getCurrentPluginService().onRebind(intent);
 	}
@@ -112,7 +108,7 @@ public class LProxyService  extends Service
 	@Override
 	public void onTrimMemory(int level)
 	{
-		// TODO: Implement this method
+		
 		super.onTrimMemory(level);
 		remote.getCurrentPluginService().onTrimMemory(level);
 	}
@@ -120,7 +116,7 @@ public class LProxyService  extends Service
 	@Override
 	public void onLowMemory()
 	{
-		// TODO: Implement this method
+		
 		super.onLowMemory();
 		remote.getCurrentPluginService().onLowMemory();
 	}
@@ -128,7 +124,7 @@ public class LProxyService  extends Service
 	@Override
 	public void onTaskRemoved(Intent rootIntent)
 	{
-		// TODO: Implement this method
+		
 		super.onTaskRemoved(rootIntent);
 		remote.getCurrentPluginService().onTaskRemoved(rootIntent);
 	}
@@ -159,5 +155,13 @@ public class LProxyService  extends Service
         }
         return super.getClassLoader();
     }
+
+	@Override
+	public ComponentName startService(Intent service)
+	{
+		LProxyService.SERVICE_CLASS_NAME = service.getComponent().getClassName();
+		service.setClass(this,LProxyService.class);
+		return super.startService(service);
+	}
 
 }
