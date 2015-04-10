@@ -20,6 +20,15 @@
 LPluginOpener.startPlugin(context,path);
 
 ```
+如果你想启动apk中的某个Activity，你可以调用以下语句<br>
+```java
+/**
+ * @param path 插件在手机中的绝对路径
+ * @param activityClassName Activity的完整类名
+ */
+LPluginOpener.startActivity(context,path,activityClassName);
+
+```
 还有什么？没了！你完全可以把插件交给一个人开发，宿主APP交给一个人开发。
 
 ## 未来的支持

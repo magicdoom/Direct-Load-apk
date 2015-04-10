@@ -281,7 +281,7 @@ public class PluginActivityControl implements PluginActivityCallback {
      */
     @Override
     public boolean callOnKeyDown(int keyCode, KeyEvent event) {
-        return getPluginRef().call("onKeyDown",keyCode,event).get();
+        return (Boolean)getPluginRef().call("onKeyDown",keyCode,event).get();
     }
 
     //Finals ADD 修复Fragment BUG
