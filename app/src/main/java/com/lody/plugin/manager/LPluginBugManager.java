@@ -29,7 +29,7 @@ public class LPluginBugManager {
         errorCollection.remove(lPluginBugListener);
     }
 
-    public static void callAllErrorListener(final LPluginBug error){
+    public static void callAllBugListener(final LPluginBug error){
         if(errorCollection.size() == 0) return;
         new EasyFor<LPluginBugListener>(errorCollection){
             @Override

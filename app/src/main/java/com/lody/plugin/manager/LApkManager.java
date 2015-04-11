@@ -100,8 +100,9 @@ public final class LApkManager {
             throw new PluginCreateFailedException("Not found ClassLoader in plugin!");
         try {
             Application pluginApp = (Application) loader.loadClass(applicationName).newInstance();
-            Reflect.on(pluginApp).call("attach", ctx.getApplicationContext());
-            apk.pluginApplication = pluginApp;
+            Reflect.on(pluginApp).call("attachBaseContext", ctx.getApplicationContext());
+			apk.pluginApplication = pluginApp;
+			pluginApp.onCreate();
 
         } catch (InstantiationException e) {
             //throw new PluginCreateFailedException(e.getMessage());

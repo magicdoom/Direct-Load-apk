@@ -51,4 +51,4 @@ public interface PluginActivityCallback {
 	void callOnNewIntent(Intent intent);
 
     void callOnConfigurationChanged(Configuration newConfig);
-}
+	}

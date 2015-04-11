@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 
@@ -115,52 +114,7 @@ public class LPluginTool {
         }
     }
 
-    /**
-     * 获取到指定包名的插件的资源属性
-     *
-     * @param cxt     当前Context
-     * @param pkgName 要打开的资源所在的包名
-     * @return
-     */
-    public static Resources getResFromPkgName(Context cxt, String pkgName)
-            throws PackageManager.NameNotFoundException {
-        return getCxtFromPkgName(cxt, pkgName).getResources();
-    }
 
-    /**
-     * 获取到指定包名的插件的资源属性
-     *
-     * @param cxt     当前Context
-     * @param apkPath 要打开的apk所在的路径
-     * @return
-     */
-    public static Resources getResFromApkPath(Context cxt, String apkPath)
-            throws PackageManager.NameNotFoundException {
-        return getCxtFromApkPath(cxt, apkPath).getResources();
-    }
 
-    /**
-     * 获取指定APP包名的Context对象
-     *
-     * @param cxt     当前Context
-     * @param pkgName 要打开的资源所在的包名
-     * @return
-     */
-    public static Context getCxtFromPkgName(Context cxt, String pkgName)
-            throws PackageManager.NameNotFoundException {
-        return cxt.createPackageContext(pkgName,
-                Context.CONTEXT_IGNORE_SECURITY);
-    }
 
-    /**
-     * 获取指定APP包名的Context对象
-     *
-     * @param cxt     当前Context
-     * @param apkPath 要打开的apk所在的路径
-     * @return
-     */
-    public static Context getCxtFromApkPath(Context cxt, String apkPath)
-            throws PackageManager.NameNotFoundException {
-        return getCxtFromPkgName(cxt, getAppInfo(cxt, apkPath).packageName);
-    }
 }

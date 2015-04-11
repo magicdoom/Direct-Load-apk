@@ -30,11 +30,14 @@ import android.app.*;
 public class PluginActivityControl implements PluginActivityCallback
 {
 
+
+
     Activity proxy;//代理Activity
     Activity plugin;//插件Activity
     Reflect proxyRef;//指向代理Activity的反射工具类
     Reflect pluginRef;//指向插件Activity的反射工具类
     Application app;//分派给插件的Application
+	Instrumentation i;
 
 
     /**
@@ -59,6 +62,8 @@ public class PluginActivityControl implements PluginActivityCallback
         this.proxy = proxy;
         this.plugin = plugin;
         this.app = app;
+		
+		i = new Instrumentation();
 
         //使反射工具类指向相应的对象
         proxyRef = Reflect.on(proxy);
@@ -104,8 +109,9 @@ public class PluginActivityControl implements PluginActivityCallback
                     proxyRef.get("mCurrentConfig"));
 
             pluginRef.set("mWindow", proxy.getWindow());
-
-            plugin.getWindow().setCallback(plugin);
+			 plugin.getWindow().setCallback(plugin);
+			Reflect.on(proxy.getBaseContext()).call("setOuterContext",plugin);
+			
 
 		}
 		catch (ReflectException e)
@@ -179,7 +185,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public void callOnCreate(Bundle saveInstance)
 	{
-        getPluginRef().call("onCreate", saveInstance);
+        //getPluginRef().call("onCreate", saveInstance);
+		i.callActivityOnCreate(plugin,saveInstance);
     }
 
     /**
@@ -189,7 +196,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public void callOnStart()
 	{
-        getPluginRef().call("onStart");
+        //getPluginRef().call("onStart");
+		i.callActivityOnStop(plugin);
     }
 
     /**
@@ -199,7 +207,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public void callOnResume()
 	{
-        getPluginRef().call("onResume");
+        //getPluginRef().call("onResume");
+		i.callActivityOnResume(plugin);
     }
 
     /**
@@ -209,7 +218,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public void callOnDestroy()
 	{
-        getPluginRef().call("onDestroy");
+        //getPluginRef().call("onDestroy");
+		i.callActivityOnDestroy(plugin);
     }
 
     /**
@@ -219,7 +229,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public void callOnStop()
 	{
-        getPluginRef().call("onStop");
+        //getPluginRef().call("onStop");
+		i.callActivityOnStop(plugin);
     }
 
     /**
@@ -229,7 +240,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public void callOnRestart()
 	{
-        getPluginRef().call("onRestart");
+        //getPluginRef().call("onRestart");
+		i.callActivityOnRestart(plugin);
     }
 
     /**
@@ -261,7 +273,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public void callOnPause()
 	{
-        getPluginRef().call("onStop");
+        //getPluginRef().call("onStop");
+		i.callActivityOnPause(plugin);
     }
 
     /**
@@ -271,7 +284,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public void callOnBackPressed()
 	{
-        getPluginRef().call("onBackPressed");
+        //getPluginRef().call("onBackPressed");
+		plugin.onBackPressed();
     }
 
     /**
@@ -284,7 +298,8 @@ public class PluginActivityControl implements PluginActivityCallback
     @Override
     public boolean callOnKeyDown(int keyCode, KeyEvent event)
 	{
-        return (Boolean)getPluginRef().call("onKeyDown", keyCode, event).get();
+		return plugin.onKeyDown(keyCode,event);
+        //return (Boolean)getPluginRef().call("onKeyDown", keyCode, event).get();
     }
 
     //Finals ADD 修复Fragment BUG
@@ -292,45 +307,52 @@ public class PluginActivityControl implements PluginActivityCallback
     public void callDump(String prefix, FileDescriptor fd, PrintWriter writer,
                          String[] args)
 	{
-        getPluginRef().call("dump", prefix, fd, writer, args);
+        //getPluginRef().call("dump", prefix, fd, writer, args);
+		plugin.dump(prefix,fd,writer,args);
     }
 
     @Override
     public void callOnConfigurationChanged(Configuration newConfig)
 	{
-        getPluginRef().call("onConfigurationChanged", newConfig);
+        //getPluginRef().call("onConfigurationChanged", newConfig);
+		plugin.onConfigurationChanged(newConfig);
     }
 
     @Override
     public void callOnPostResume()
 	{
         getPluginRef().call("onPostResume");
+		
     }
 
     @Override
     public void callOnDetachedFromWindow()
 	{
-        getPluginRef().call("onDetachedFromWindow");
+        //getPluginRef().call("onDetachedFromWindow");
+		plugin.onDetachedFromWindow();
     }
 
     @Override
     public View callOnCreateView(String name, Context context,
                                  AttributeSet attrs)
 	{
-        return getPluginRef().call("onCreateView", name, context, attrs).get();
+		return plugin.onCreateView(name,context,attrs);
+        //return getPluginRef().call("onCreateView", name, context, attrs).get();
     }
 
     @Override
     public View callOnCreateView(View parent, String name, Context context,
                                  AttributeSet attrs)
 	{
-        return getPluginRef().call("onCreateView", parent, name, context, attrs).get();
+		return plugin.onCreateView(parent,name,context,attrs);
+       // return getPluginRef().call("onCreateView", parent, name, context, attrs).get();
     }
 
     @Override
     public void callOnNewIntent(Intent intent)
 	{
-        getPluginRef().call("onNewIntent");
+       // getPluginRef().call("onNewIntent");
+	   i.callActivityOnNewIntent(plugin,intent);
     }
 
 }

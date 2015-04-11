@@ -2,7 +2,7 @@ package com.lody.plugin.manager;
 
 import android.content.Context;
 
-import com.lody.plugin.LSOUnpacker;
+import com.lody.plugin.NativeLibUnpacker;
 import com.lody.plugin.reflect.Reflect;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ public class LPluginDexManager extends DexClassLoader {
                                 String libraryPath, ClassLoader parent) {
         super(dexPath, optimizedDirectory, libraryPath, parent);
         finalApkPath = dexPath;
-        LSOUnpacker.unPackSOFromApk(dexPath,libraryPath);
+        NativeLibUnpacker.unPackSOFromApk(dexPath, libraryPath);
     }
 
     /**

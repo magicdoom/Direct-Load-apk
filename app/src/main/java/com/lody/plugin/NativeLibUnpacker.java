@@ -20,9 +20,9 @@ import java.util.zip.ZipFile;
  *
  * 根据CPU型号解压apk内的相应的.so文件
  */
-public class LSOUnpacker {
+public class NativeLibUnpacker {
     
-    public static final String TAG = LSOUnpacker.class.getSimpleName();
+    public static final String TAG = NativeLibUnpacker.class.getSimpleName();
     public static final String DEF_ARCH_1 = "armeabi";
     public static final String DEF_ARCH_2 = "armeabi-v7a";
     public static String ARCH = System.getProperty("os.arch");
@@ -69,7 +69,6 @@ public class LSOUnpacker {
                 if (sp > 0) {
                     String osArch = name.substring(4, sp);
                     en2add=osArch.toLowerCase();
-                    Log.i(TAG,en2add);
                 } else {
                     en2add=DEF_ARCH_1;
                 }

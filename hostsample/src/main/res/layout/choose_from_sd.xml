@@ -12,7 +12,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="打开插件"
-        android:id="@+id/打开插件"
+        android:text="Open plugin"
+        android:id="@+id/open_plugin"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>

@@ -15,6 +15,7 @@ public class LProxyService  extends Service
 	LServicePlugin remote;
 	public static String SERVICE_CLASS_NAME = Service.class.getName();
 	public static String SERVICE_APK_PATH = LPluginDexManager.finalApkPath;
+	
 	@Override
 	public IBinder onBind(Intent i)
 	{
@@ -45,9 +46,11 @@ public class LProxyService  extends Service
 	{
 		remote = new LServicePlugin(this,SERVICE_APK_PATH);
 		remote.setTopServiceName(SERVICE_CLASS_NAME);
+		remote.from().debug();
 		if(!remote.from().canUse()){
 			LApkManager.initApk(remote.from(),this);
 		}
+		
 		try
 		{
 
