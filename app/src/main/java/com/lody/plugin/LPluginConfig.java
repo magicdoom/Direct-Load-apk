@@ -3,7 +3,7 @@ package com.lody.plugin;
 /**
  * Created by lody  on 2015/3/24.
  * <p/>
- * 插件的配置信息
+ * 保存插件的配置信息
  */
 public class LPluginConfig {
     /**
@@ -28,6 +28,13 @@ public class LPluginConfig {
      */
     public static final String KEY_PLUGIN_INDEX = "activity_index";
 
-    public static final String ContextImpClassName = "android.app.ContextImpl";
+    /**
+     * 是否使用插件的标题
+     */
+    public static boolean usePluginTitle = true;
+	/**
+	 * ProxyService需要托管新的Service
+	 */
+	public static boolean FLAG_NEW_SERVICE;
 
 }

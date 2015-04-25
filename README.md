@@ -1,71 +1,67 @@
-Direct-load-apk
-===================
-![enter image description here](http://www.xiaoxiongbizhi.com/wallpapers/1152_864_85/u/x/uxcccgx3r.jpg)
-Description
--------------
+[![开源实验室](http://www.kymjs.com/image/logo_s.png)](http://www.kymjs.com/)<h2>Direct-Load-apk(DLA)</h2>
 
-Direct - load - apk is a very powerful plugin framework, through the use of it, you can achieve incredible function ----- **load directly from a basic apk!** 
+## Description
+As an Android developer, have you tried to run an **uninstalled APK** ? Have you tried to start an APK **without any constraint** ?  <br>
+DLA is a powerful pluggable framework to implement this function. By use it , you can not only to run an uninstalled APK **directly**  , But also you can choose an Activity or Service from any APK to run!<br>
 
-> **Advantage:** 
-> - Direct - load - apk can load a apk all **Resources**. 
-> - Support to jump between the **plugin Activity**. 
-> - Don't like "**[dynamic load - apk](https://github.com/singwhatiwanna/dynamic-load-apk)**" , [**"Direct - load - apk"**](https://github.com/asLody/Direct-load-apk) do not need to inherit the custom Activity, and can directly use this pointer. 
+## Related links
+* QQ Group in China：[362901808](http://jq.qq.com/?_wv=1027&k=SKRiD0);<br>
+* Git@OSC：[ http://git.oschina.net/lody/Direct-load-apk ]<br>
+* Open laboratory's Home page：[http://www.kymjs.com/DLA](http://www.kymjs.com/blog/2015/04/01/DLA.html)
 
-#### <i class="icon-folder-open"></i> ***Usage***
+## Usage
+1、Add **com.lody.plugin.LActivityProxy** tag in your host APP's AndroidManifest.xml.<br>
+2、Add **com.lody.plugin.LProxyService** tag in your host APP's AndroidManifest.xml.<br>
+3、Add the following code when you want to start an Plugin.<br>
+```java
+/**
+ * @param context
+ * @param path 
+ */
+LPluginOpener.startPlugin(context,path);
 
-Direct - load - apk is very convenient to use .You can write to start an APK likes this:
+```
+If you only want to start an Activity from an apk,you can write down the code like this.<br>
+```java
+/**
+ * @param path 
+ * @param activityClassName 
+ */
+LPluginOpener.startActivity(context,path,activityClassName);
 
-    PluginLaunch.startPlugin(Context,Path);
+```
+If you only want to start an Service from an apk,you can write down the code like this.<br>
+```java
+/**
+ * @param path 
+ * @param serviceClassName 
+ */
+LPluginOpener.startService(context,path,serviceClassName);
 
-> **Tip:** Don't forget to write **com.lody.plugin.LActivityProxy** in AndroidManifest.xml.
-#### <i class="icon-pencil"></i> The development **Progress** and **TODO**
-> - Service support in the near.
-> -  Run the apk which is included the file of ".so" in the near.
-> - Support Plug-in security isolation system In the future.
+```
+What else? No! The use of DLA is so simple.
+## Future support
+As you can see,  DLA has been able to load the plug-in for Application, Activity and Service, and the other components's support is only a matter of time!
+Another support point is the theme of the skin loading, this is also a target.<br>
+If you have any other requirements, welcome to [Here](http://jq.qq.com/?_wv=1027&k=SKRiD0).<br>
 
-**Author**
--------------
-	 Lody, from China, who is An ideal are ambitious young man.
-If you have any question , please send **Email** to here: **382816028@qq.com** , You can also Contact me through **QQ**:**382816028**.
+## Apache License
 
-##QQ GROUP:
-###362901808
+Copyright 2015, Lody.
 
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-####中文版
-描述
--------------
+       http://www.apache.org/licenses/LICENSE-2.0
 
-Direct - load - apk 是一个强大的插件化框架, 通过使用它, 你可以实现看似不可能实现的功能 ----- **直接加载一个普通apk!** 
-
-> **优势:** 
-> - Direct - load - apk 能够加载插件的全部 **资源**. 
-> - 支持 *插件间* Activity跳转. 
-> - 不像 **"[dynamic load - apk](https://github.com/singwhatiwanna/dynamic-load-apk)"** 这个项目, [**"Direct - load - apk"**](https://github.com/FinalLody/Direct-Load-apk/) 不需要对插件有任何约束，也不需要在插件中引入jar和继承自定义Activity，可以直接使用this指针。
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
 
- #### <i class="icon-folder-open"></i> 使用方法
-
-Direct - load - apk 的使用相当方便，可以像这样写:
-
-    PluginLaunch.startPlugin(Context,Path);
-
-> **提示:** 不要忘了在 AndroidManifest.xml 加入 **com.lody.plugin.LActivityProxy** .
-
-#### <i class="icon-pencil"></i> 开发 **进度** 和 **未来将要做的**
-> - 即将支持Service.
-> -  即将支持运行带有.so的apk.
-> - 提供完整的插件异常处理机制.
-
-**作者**
--------------
-     Lody, 一个富有开源精神和创造力的Android开发者。
-如果你有任何问题 , 可以发送 **Email** 到 *382816028@qq.com* , 也可以联系我的 *QQ* :382816028.
-
-##QQ 群:
-###362901808
-##GitHub:
-### https://github.com/FinalLody/Direct-Load-apk/
-##OsChina
-### http://git.oschina.net/lody/Direct-load-apk/
+## Author
+**Lody**，an Android developer from ZheJiang NingBo.Willing to make friends, like to share.
 
